@@ -15,6 +15,8 @@
 		24D4E1AA17887320007E9D6C /* push_provider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24D4E1A817887320007E9D6C /* push_provider.hpp */; };
 		24D4E1AE178874CC007E9D6C /* apns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E1AC178874CC007E9D6C /* apns.cpp */; };
 		24D4E1AF178874CC007E9D6C /* apns.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24D4E1AD178874CC007E9D6C /* apns.hpp */; };
+		24D4E1B2178A4684007E9D6C /* gcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E1B0178A4684007E9D6C /* gcm.cpp */; };
+		24D4E1B3178A4684007E9D6C /* gcm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24D4E1B1178A4684007E9D6C /* gcm.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +52,8 @@
 		24D4E1A817887320007E9D6C /* push_provider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = push_provider.hpp; sourceTree = "<group>"; };
 		24D4E1AC178874CC007E9D6C /* apns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns.cpp; sourceTree = "<group>"; };
 		24D4E1AD178874CC007E9D6C /* apns.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns.hpp; sourceTree = "<group>"; };
+		24D4E1B0178A4684007E9D6C /* gcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm.cpp; sourceTree = "<group>"; };
+		24D4E1B1178A4684007E9D6C /* gcm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +118,8 @@
 		24D4E1AB178874C0007E9D6C /* providers */ = {
 			isa = PBXGroup;
 			children = (
+				24D4E1B0178A4684007E9D6C /* gcm.cpp */,
+				24D4E1B1178A4684007E9D6C /* gcm.hpp */,
 				24D4E1AC178874CC007E9D6C /* apns.cpp */,
 				24D4E1AD178874CC007E9D6C /* apns.hpp */,
 			);
@@ -129,6 +135,7 @@
 			files = (
 				24D4E1AA17887320007E9D6C /* push_provider.hpp in Headers */,
 				24D4E1AF178874CC007E9D6C /* apns.hpp in Headers */,
+				24D4E1B3178A4684007E9D6C /* gcm.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,6 +212,7 @@
 				24D4E192178863B6007E9D6C /* push_service.cpp in Sources */,
 				24D4E1A917887320007E9D6C /* push_provider.cpp in Sources */,
 				24D4E1AE178874CC007E9D6C /* apns.cpp in Sources */,
+				24D4E1B2178A4684007E9D6C /* gcm.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

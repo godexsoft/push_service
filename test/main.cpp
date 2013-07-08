@@ -11,6 +11,7 @@
 
 // include used providers
 #include "apns.hpp"
+#include "gcm.hpp"
 
 using namespace boost::asio;
 using namespace push;
@@ -32,6 +33,19 @@ int main(int argc, const char * argv[])
     std::cout << "Validator says " << (flag?"all good":"invalid") << "\n";
     
     long ident = ps.post(dev1, "{...}");
+    std::cout << "push message sent with id " << ident << std::endl;
+    
+    // enable gcm with settings
+    gcm google_push(ps, "host", "port", "project_id", "api_key");
+
+    // create an google push device
+    device dev2(gcm::key, "something");
+    
+    // validate token
+    flag = ps.validate_device(dev2);
+    std::cout << "Validator says " << (flag?"all good":"invalid") << "\n";
+    
+    ident = ps.post(dev2, "{...}");
     std::cout << "push message sent with id " << ident << std::endl;
     
     return 0;

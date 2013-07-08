@@ -11,7 +11,8 @@
 
 namespace push {
 
-    apns::apns(push_service& ps, const std::string& host, const std::string& port, const std::string& cert, const std::string& priv_key)
+    apns::apns(push_service& ps, const std::string& host, const std::string& port,
+               const std::string& cert, const std::string& priv_key)
     : provider(ps, apns::key)
     {
     }
