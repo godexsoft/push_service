@@ -6,24 +6,27 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include "push_service.hpp"
+#include <push/push_service.hpp>
 
 namespace push {
     
     push_service::push_service(boost::asio::io_service& io)
     : io_(io)
+    , work_(io_)
     {
     }
     
-    long push_service::post(const device& dev, const std::string& raw_payload,
-                            const long expiration, const long ident)
+    uint32_t push_service::post(const device& dev, const std::string& raw_payload,
+                            const uint32_t expiration, const uint32_t
+                                ident)
     {
         if( ! providers_.count(dev.provider_class))
         {
             throw std::runtime_error(dev.provider_class + " was not registered. Can't post push notification.");
         }
-        
-        return ident;
+
+        return providers_.at(dev.provider_class)
+                ->post(dev, raw_payload, expiration, ident);
     }
     
     bool push_service::validate_device(const device& dev) const
@@ -50,5 +53,10 @@ namespace push {
     {
         providers_.erase( provider_key );
     }
-    
+
+    boost::asio::io_service& push_service::get_io_service()
+    {
+        return io_;
+    }
+
 } // namespace push

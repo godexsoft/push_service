@@ -7,46 +7,51 @@
 //
 
 #include <iostream>
-#include "push_service.hpp"
-
-// include used providers
-#include "apns.hpp"
-#include "gcm.hpp"
+#include <boost/thread.hpp>
+#include <push_service.hpp>
 
 using namespace boost::asio;
+using namespace boost;
+using namespace std;
+
 using namespace push;
 
 int main(int argc, const char * argv[])
 {
+    io_service      io;
+    thread_group    threads;
     
-    io_service io;
-    push_service ps(io);
+    push_service    ps(io);
     
-    // enable apple push with settings
-    apns apple_push(ps, "host", "port", "cert", "key");
+    try
+    {
+        apns apple_push(ps,
+            "gateway.sandbox.push.apple.com",  // Host for APNS
+            "2195",                            // Port for APNS
+            "/tmp/cert.pem",                   // Certificate path (PEM format)
+            "/tmp/key.pem");                   // Private key path (PEM format)
     
-    // create an ios push device
-    device dev1(apns::key, "mega token");
-    
-    // validate token
-    bool flag = ps.validate_device(dev1);
-    std::cout << "Validator says " << (flag?"all good":"invalid") << "\n";
-    
-    long ident = ps.post(dev1, "{...}");
-    std::cout << "push message sent with id " << ident << std::endl;
-    
-    // enable gcm with settings
-    gcm google_push(ps, "host", "port", "project_id", "api_key");
+        // spawn some threads to handle our stuff
+        for(int i=0; i<3; ++i)
+        {
+            threads.create_thread(
+                boost::bind(&io_service::run, &io) );
+        }
 
-    // create an google push device
-    device dev2(gcm::key, "something");
-    
-    // validate token
-    flag = ps.validate_device(dev2);
-    std::cout << "Validator says " << (flag?"all good":"invalid") << "\n";
-    
-    ident = ps.post(dev2, "{...}");
-    std::cout << "push message sent with id " << ident << std::endl;
+        // post test
+        device dev1(apns::key, "12345");
+        ps.post(dev1, "{\"aps\" : {\"alert\":\"Test message\"}}");
+        
+        // run on main thread too
+        io.run();
+        
+        // wait for all threads to finish spinning
+        threads.join_all();
+    }
+    catch(std::exception& e)
+    {
+        cerr << "Exception: " << e.what() << "\n";
+    }
     
     return 0;
 }

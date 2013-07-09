@@ -29,7 +29,10 @@ namespace push {
         ~provider();
         
         virtual bool validate_device(const device& dev) const = 0;
-        
+
+        virtual uint32_t post(const device& dev, const std::string& payload,
+                              const uint32_t expiry, const uint32_t ident) = 0;
+
     private:
         push_service& push_service_;
         const std::string provider_key_;

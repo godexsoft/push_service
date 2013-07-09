@@ -9,7 +9,7 @@
 #ifndef _GCM_PROVIDER_HPP_
 #define _GCM_PROVIDER_HPP_
 
-#include "push_provider.hpp"
+#include <push/push_provider.hpp>
 
 #include <string>
 
@@ -24,6 +24,9 @@ namespace push {
             const std::string& project_id, const std::string& api_key);
         
         bool validate_device(const device& dev) const;
+
+        uint32_t post(const device& dev, const std::string& payload,
+                      const uint32_t expiry, const uint32_t ident);
     };
     
 } // namespace push

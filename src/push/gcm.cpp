@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include "gcm.hpp"
+#include <push/gcm.hpp>
 #include <iostream>
 
 namespace push {
@@ -22,7 +22,14 @@ namespace push {
         std::cout << "Validate GCM device with token " << dev.token << "\n";
         return true;
     }
+
+    uint32_t gcm::post(const device& dev, const std::string& payload,
+                       const uint32_t expiry, const uint32_t ident)
+    {
+        return ident;
+    }
+
     
-    const char* gcm::key = "GCM provider";
+    const char* gcm::key = "gcm";
     
 } // namespace push
