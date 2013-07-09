@@ -12,7 +12,6 @@ namespace push {
     
     push_service::push_service(boost::asio::io_service& io)
     : io_(io)
-    , work_(io_)
     {
     }
     

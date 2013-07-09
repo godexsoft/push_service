@@ -34,7 +34,6 @@ namespace push {
         void remove_provider(const std::string& provider_key);
         
         boost::asio::io_service& io_;
-        boost::asio::io_service::work work_;
         std::map<std::string, provider*> providers_;
     };
     

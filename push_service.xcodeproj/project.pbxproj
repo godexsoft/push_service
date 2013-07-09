@@ -61,7 +61,7 @@
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
 		24D4E198178863DC007E9D6C /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E19A178863DC007E9D6C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		24D4E1A4178871D2007E9D6C /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../../../usr/local/lib/libboost_system.a; sourceTree = "<group>"; };
+		24D4E1A4178871D2007E9D6C /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = /usr/local/lib/libboost_system.a; sourceTree = "<absolute>"; };
 		24D4E1A717887320007E9D6C /* push_provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_provider.cpp; sourceTree = "<group>"; };
 		24D4E1A817887320007E9D6C /* push_provider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = push_provider.hpp; sourceTree = "<group>"; };
 		24D4E1AC178874CC007E9D6C /* apns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns.cpp; sourceTree = "<group>"; };
@@ -70,7 +70,7 @@
 		24D4E1B1178A4684007E9D6C /* gcm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm.hpp; sourceTree = "<group>"; };
 		24D4E1B5178AF6A7007E9D6C /* apns_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns_connection.cpp; sourceTree = "<group>"; };
 		24D4E1B6178AF6A7007E9D6C /* apns_connection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_connection.hpp; sourceTree = "<group>"; };
-		24D4E1B9178B1F3D007E9D6C /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = ../../../../usr/local/lib/libboost_thread.a; sourceTree = "<group>"; };
+		24D4E1B9178B1F3D007E9D6C /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = /usr/local/lib/libboost_thread.a; sourceTree = "<absolute>"; };
 		F44B202B92528F8F9F233C67 /* connection_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = connection_pool.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -97,13 +97,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		24D4E17E17886344007E9D6C = {
+		242E7022178C74BB00C9AD10 /* linker */ = {
 			isa = PBXGroup;
 			children = (
 				242E7019178C2C8D00C9AD10 /* libcrypto.dylib */,
 				242E7017178C2C8700C9AD10 /* libssl.dylib */,
 				24D4E1B9178B1F3D007E9D6C /* libboost_thread.a */,
 				24D4E1A4178871D2007E9D6C /* libboost_system.a */,
+			);
+			name = linker;
+			sourceTree = "<group>";
+		};
+		242E7023178C750300C9AD10 /* public */ = {
+			isa = PBXGroup;
+			children = (
+				242E701F178C54DA00C9AD10 /* push_service.hpp */,
+			);
+			name = public;
+			sourceTree = "<group>";
+		};
+		24D4E17E17886344007E9D6C = {
+			isa = PBXGroup;
+			children = (
+				242E7022178C74BB00C9AD10 /* linker */,
 				24D4E18E17886358007E9D6C /* src */,
 				24D4E199178863DC007E9D6C /* test */,
 				24D4E18817886344007E9D6C /* Products */,
@@ -122,12 +138,8 @@
 		24D4E18E17886358007E9D6C /* src */ = {
 			isa = PBXGroup;
 			children = (
-				242E701F178C54DA00C9AD10 /* push_service.hpp */,
-				24D4E1AB178874C0007E9D6C /* providers */,
-				24D4E18F17886372007E9D6C /* push_service.hpp */,
-				24D4E190178863B6007E9D6C /* push_service.cpp */,
-				24D4E1A717887320007E9D6C /* push_provider.cpp */,
-				24D4E1A817887320007E9D6C /* push_provider.hpp */,
+				242E7023178C750300C9AD10 /* public */,
+				24D4E1AB178874C0007E9D6C /* api */,
 			);
 			name = src;
 			path = src/push;
@@ -141,16 +153,20 @@
 			path = test;
 			sourceTree = "<group>";
 		};
-		24D4E1AB178874C0007E9D6C /* providers */ = {
+		24D4E1AB178874C0007E9D6C /* api */ = {
 			isa = PBXGroup;
 			children = (
 				24D4E1B4178AF685007E9D6C /* detail */,
+				24D4E18F17886372007E9D6C /* push_service.hpp */,
+				24D4E190178863B6007E9D6C /* push_service.cpp */,
+				24D4E1A717887320007E9D6C /* push_provider.cpp */,
+				24D4E1A817887320007E9D6C /* push_provider.hpp */,
 				24D4E1B0178A4684007E9D6C /* gcm.cpp */,
 				24D4E1B1178A4684007E9D6C /* gcm.hpp */,
 				24D4E1AC178874CC007E9D6C /* apns.cpp */,
 				24D4E1AD178874CC007E9D6C /* apns.hpp */,
 			);
-			name = providers;
+			name = api;
 			sourceTree = "<group>";
 		};
 		24D4E1B4178AF685007E9D6C /* detail */ = {
@@ -286,7 +302,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -323,7 +339,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
-				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;

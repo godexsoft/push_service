@@ -30,6 +30,10 @@ int main(int argc, const char * argv[])
             "2195",                            // Port for APNS
             "/tmp/cert.pem",                   // Certificate path (PEM format)
             "/tmp/key.pem");                   // Private key path (PEM format)
+
+        // post test
+        device dev1(apns::key, "12345");
+        ps.post(dev1, "{\"aps\" : {\"alert\":\"Test message\"}}");
     
         // spawn some threads to handle our stuff
         for(int i=0; i<3; ++i)
@@ -37,10 +41,6 @@ int main(int argc, const char * argv[])
             threads.create_thread(
                 boost::bind(&io_service::run, &io) );
         }
-
-        // post test
-        device dev1(apns::key, "12345");
-        ps.post(dev1, "{\"aps\" : {\"alert\":\"Test message\"}}");
         
         // run on main thread too
         io.run();
