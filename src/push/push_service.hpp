@@ -23,7 +23,7 @@ namespace push {
         explicit push_service(boost::asio::io_service& io);
         
         uint32_t post(const device& dev, const std::string& raw_payload,
-                  const uint32_t expiration = 0, const uint32_t ident = 123456); // todo: random ident
+                      const uint32_t expiration = 0, const uint32_t ident = 123456); // todo: random ident
         
         bool validate_device(const device& dev) const;
 

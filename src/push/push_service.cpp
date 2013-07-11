@@ -10,29 +10,30 @@
 
 namespace push {
     
-    push_service::push_service(boost::asio::io_service& io)
+    push_service::push_service(boost::asio::io_service& io)                              
     : io_(io)
     {
     }
     
     uint32_t push_service::post(const device& dev, const std::string& raw_payload,
-                            const uint32_t expiration, const uint32_t
-                                ident)
+                                const uint32_t expiration, const uint32_t ident)
     {
         if( ! providers_.count(dev.provider_class))
         {
-            throw std::runtime_error(dev.provider_class + " was not registered. Can't post push notification.");
+            throw std::runtime_error(dev.provider_class +
+                " was not registered. Can't post push notification.");
         }
 
         return providers_.at(dev.provider_class)
-                ->post(dev, raw_payload, expiration, ident);
+            ->post(dev, raw_payload, expiration, ident);
     }
     
     bool push_service::validate_device(const device& dev) const
     {
         if( ! providers_.count(dev.provider_class))
         {
-            throw std::runtime_error(dev.provider_class + " was not registered. Can't validate device.");
+            throw std::runtime_error(dev.provider_class +
+                " was not registered. Can't validate device.");
         }
         
         return providers_.at(dev.provider_class)->validate_device(dev);

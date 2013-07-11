@@ -18,19 +18,23 @@ namespace push {
     class device;
     
 namespace detail {
-
+    
     class apns_request
     {
     public:
+        friend class apns_connection;
+
+        apns_request();
+        
         apns_request(const device& dev, const std::string& payload,
                      const uint32_t expiry, const uint32_t ident);
 
     private:
         boost::array<char, 1024> body_;
-        int len_;
+        long len_;
     };
 
 } // namespace detail
 } // namespace push
 
-#endif // _PUSH_SERVICE_APNS_CONNECTION_HPP_
+#endif // _PUSH_SERVICE_APNS_REQUEST_HPP_

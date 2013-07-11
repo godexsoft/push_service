@@ -12,6 +12,10 @@
 		242E701D178C4E4C00C9AD10 /* apns_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E701B178C4E4C00C9AD10 /* apns_request.cpp */; };
 		242E701E178C4E4C00C9AD10 /* apns_request.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E701C178C4E4C00C9AD10 /* apns_request.hpp */; };
 		242E7020178C54DB00C9AD10 /* push_service.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E701F178C54DA00C9AD10 /* push_service.hpp */; };
+		242E7026178EB35500C9AD10 /* apns_response.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E7024178EB35400C9AD10 /* apns_response.cpp */; };
+		242E7027178EB35500C9AD10 /* apns_response.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E7025178EB35400C9AD10 /* apns_response.hpp */; };
+		242E702A178F23C000C9AD10 /* apns_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E7028178F23C000C9AD10 /* apns_errors.cpp */; };
+		242E702B178F23C000C9AD10 /* apns_errors.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E7029178F23C000C9AD10 /* apns_errors.hpp */; };
 		24D4E192178863B6007E9D6C /* push_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E190178863B6007E9D6C /* push_service.cpp */; };
 		24D4E19B178863DC007E9D6C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E19A178863DC007E9D6C /* main.cpp */; };
 		24D4E1A317886EE9007E9D6C /* libpush_service.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E18717886344007E9D6C /* libpush_service.a */; };
@@ -56,6 +60,10 @@
 		242E701B178C4E4C00C9AD10 /* apns_request.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns_request.cpp; sourceTree = "<group>"; };
 		242E701C178C4E4C00C9AD10 /* apns_request.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_request.hpp; sourceTree = "<group>"; };
 		242E701F178C54DA00C9AD10 /* push_service.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = push_service.hpp; path = src/push_service.hpp; sourceTree = SOURCE_ROOT; };
+		242E7024178EB35400C9AD10 /* apns_response.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns_response.cpp; sourceTree = "<group>"; };
+		242E7025178EB35400C9AD10 /* apns_response.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_response.hpp; sourceTree = "<group>"; };
+		242E7028178F23C000C9AD10 /* apns_errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns_errors.cpp; sourceTree = "<group>"; };
+		242E7029178F23C000C9AD10 /* apns_errors.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_errors.hpp; sourceTree = "<group>"; };
 		24D4E18717886344007E9D6C /* libpush_service.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpush_service.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E18F17886372007E9D6C /* push_service.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = push_service.hpp; sourceTree = "<group>"; };
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
@@ -156,6 +164,8 @@
 		24D4E1AB178874C0007E9D6C /* api */ = {
 			isa = PBXGroup;
 			children = (
+				242E7028178F23C000C9AD10 /* apns_errors.cpp */,
+				242E7029178F23C000C9AD10 /* apns_errors.hpp */,
 				24D4E1B4178AF685007E9D6C /* detail */,
 				24D4E18F17886372007E9D6C /* push_service.hpp */,
 				24D4E190178863B6007E9D6C /* push_service.cpp */,
@@ -172,6 +182,8 @@
 		24D4E1B4178AF685007E9D6C /* detail */ = {
 			isa = PBXGroup;
 			children = (
+				242E7024178EB35400C9AD10 /* apns_response.cpp */,
+				242E7025178EB35400C9AD10 /* apns_response.hpp */,
 				242E701B178C4E4C00C9AD10 /* apns_request.cpp */,
 				242E701C178C4E4C00C9AD10 /* apns_request.hpp */,
 				24D4E1B5178AF6A7007E9D6C /* apns_connection.cpp */,
@@ -195,6 +207,8 @@
 				F44B2E1B3F6ACED61D7407BF /* connection_pool.hpp in Headers */,
 				242E701E178C4E4C00C9AD10 /* apns_request.hpp in Headers */,
 				242E7020178C54DB00C9AD10 /* push_service.hpp in Headers */,
+				242E7027178EB35500C9AD10 /* apns_response.hpp in Headers */,
+				242E702B178F23C000C9AD10 /* apns_errors.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +288,8 @@
 				24D4E1B2178A4684007E9D6C /* gcm.cpp in Sources */,
 				24D4E1B7178AF6A7007E9D6C /* apns_connection.cpp in Sources */,
 				242E701D178C4E4C00C9AD10 /* apns_request.cpp in Sources */,
+				242E7026178EB35500C9AD10 /* apns_response.cpp in Sources */,
+				242E702A178F23C000C9AD10 /* apns_errors.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,74 +10,105 @@
 #define _PUSH_SERVICE_CONNECTION_POOL_HPP_
 
 #include <vector>
+#include <queue>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/bind/bind.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 namespace push {
 namespace detail {
 
-    template<typename T>
+    template<typename T, typename J>
     class connection_pool
     {
     public:
+        typedef apns_connection::error_callback_type
+            error_callback_type;
+        
         connection_pool(boost::asio::io_service& io, const uint32_t cnt)
+        : callback_io_(io)
         {
+            if(cnt < 1)
+            {
+                throw std::runtime_error("connection_pool must specify 1 or more as connections count.");
+            }
+            
             for(uint32_t i = 0; i<cnt; ++i)
             {
-                connections_.push_back( boost::shared_ptr<T>( new T(io) ) );
+                boost::shared_ptr<T> con = boost::shared_ptr<T> ( new T(*this) );
+                
+                threads_.create_thread(
+                    boost::bind(&boost::asio::io_service::run, boost::ref(con->get_io_service())) );
+
+                connections_.push_back(con);
             }
+        }
+        
+        ~connection_pool()
+        {
+            // stop all connections
+            std::for_each(connections_.begin(), connections_.end(),
+                boost::bind(&T::stop, _1) );
+
+            threads_.join_all();
         }
 
         void start(boost::asio::ssl::context& context,
-                   boost::asio::ip::tcp::resolver::iterator iterator)
+                   boost::asio::ip::tcp::resolver::iterator iterator,
+                   const error_callback_type& cb)
         {
-            boost::lock_guard<boost::mutex> locked(mutex_); // just to be extra sure
-            
             std::for_each(connections_.begin(), connections_.end(),
-                boost::bind(&T::start, _1, boost::ref(context), iterator) );
-
-            elect_leader();
+                boost::bind(&T::start, _1, &context, iterator, callback_io_.wrap(cb) ) );
         }
-
-        boost::shared_ptr<T> get_connection()
+        
+        void post(const J& job)
         {
-            boost::lock_guard<boost::mutex> locked(mutex_);
-            boost::shared_ptr<T> tmp = leader_;
-
-            elect_leader();
-
-            return tmp;
-        }
-
-    private:
-        void elect_leader()
-        {
-            // TODO: employ a smarter strategy than picking the next available
-            for(int i=0; i<connections_.size(); ++i)
             {
-                if(connections_.at(i)->is_available() && connections_.at(i) != leader_)
-                {
-                    leader_ = connections_.at(i);
-                    return;
-                }
+                boost::lock_guard<boost::mutex> lock(mutex_);
+                jobs_.push(job);
             }
 
-            // self-DoS atack prevented :D
-            throw std::runtime_error("Ran out of available connections while electing new leader");
+            condition_.notify_one();
         }
+
+        bool get_next_job(J& req, const boost::posix_time::time_duration& timeout)
+        {
+            boost::unique_lock<boost::mutex> lock(mutex_);
+            while(jobs_.empty())
+            {
+                if(!condition_.timed_wait(lock, timeout))
+                {
+                    return false;
+                }
+            }
+            
+            req = jobs_.front();
+            jobs_.pop();
+            
+            return true;
+        }
+        
+    private:
+        /// io_service which we will use for the callbacks
+        boost::asio::io_service&    callback_io_;
+
+        /// Connection pool's own threads
+        boost::thread_group         threads_;
 
         /// All available connections
         std::vector<boost::shared_ptr<T> > connections_;
 
-        /// Current leader of the pool
-        boost::shared_ptr<T> leader_;
+        boost::mutex                mutex_;
+        boost::condition_variable   condition_;
         
-        /// Mutex for elections
-        boost::mutex mutex_;
+        /// Requests to process
+        std::queue<J> jobs_;
     };
 
 } // namespace detail
