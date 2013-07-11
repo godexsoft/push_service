@@ -3,8 +3,12 @@ This library can be used to develop a push server with support for multiple serv
 
 Require 
 
-- boost::asio.
+- Boost.Asio
 
 License
 
 - New BSD
+
+Example:
+
+- See test/main.cpp
