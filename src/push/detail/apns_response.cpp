@@ -14,7 +14,7 @@ namespace push {
 namespace detail {
 
     apns_response::apns_response(boost::asio::streambuf& data)
-    : status_(push::error::NO_ERROR)
+    : status_(push::error::no_error)
     , identity_(0) // unset
     {
         boost::asio::streambuf::const_buffers_type bufs = data.data();
@@ -36,9 +36,54 @@ namespace detail {
         identity_ = ntohl(ident);
     }
     
+    apns_feedback_response::apns_feedback_response(std::string& data)
+    {
+        char* p = &data.at(0);
+        
+        time_t t;
+        memcpy(&t, p, sizeof(time_t));
+        p += sizeof(time_t);
+        
+        time_ = boost::posix_time::from_time_t(t);
+        
+        uint16_t token_len;
+        memcpy(&token_len, p, sizeof(uint16_t));
+        p += sizeof(uint16_t);
+
+        token_len = ntohs(token_len);
+        
+        std::cout << "token len is " << token_len << std::endl;
+        std::vector<char> token_bytes(token_len, 0);
+
+        memcpy(&token_bytes.at(0), p, token_len);
+        token_ = std::string(token_bytes.begin(), token_bytes.end());
+        
+        std::cout << "token: " << token_ << std::endl;
+    }
+    
     const boost::system::error_code apns_response::to_error_code() const
     {
-        return boost::system::error_code(status_, apns_cat_);
+        return boost::system::error_code(status_, push::error::apns_error_category);
+    }
+    
+    const push::error::apns_err_code apns_response::get_status() const
+    {
+        return status_;
+    }
+    
+    const uint32_t apns_response::get_identity() const
+    {
+        return identity_;
+    }
+
+    const boost::posix_time::ptime apns_feedback_response::get_time() const
+    {
+        return time_;
+    }
+    
+    const std::string apns_feedback_response::get_token() const
+    {
+        return token_;
     }
 
 } // namespace detail

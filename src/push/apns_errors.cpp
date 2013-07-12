@@ -20,27 +20,27 @@ namespace error {
     {        
         switch(ev)
         {
-            case NO_ERROR:
+            case no_error:
                 return "no error";
-            case PROCESSING_ERROR:
+            case processing_error:
                 return "processing error";
-            case MISSING_DEV_TOKEN:
+            case missing_dev_token:
                 return "dev token is missing";
-            case MISSING_TOPIC:
+            case missing_topic:
                 return "topic is missing";
-            case MISSING_PAYLOAD:
+            case missing_payload:
                 return "payload is missing";
-            case INVALID_TOKEN_SIZE:
+            case invalid_token_size:
                 return "invalid token size";
-            case INVALID_TOPIC_SIZE:
+            case invalid_topic_size:
                 return "invalid topic size";
-            case INVALID_PAYLOAD_SIZE:
+            case invalid_payload_size:
                 return "invalid payload size";
-            case INVALID_TOKEN:
+            case invalid_token:
                 return "invalid token";
-            case SHUTDOWN:
+            case shutdown:
                 return "connection shutdown by remote host";            
-            case UNKNOWN:
+            case unknown:
             default:
                 return "unknown error";
         }

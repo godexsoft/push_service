@@ -12,6 +12,7 @@
 #include <push/push_provider.hpp>
 
 #include <push/detail/apns_connection.hpp>
+#include <push/detail/apns_feedback_connection.hpp>
 #include <push/detail/connection_pool.hpp>
 
 #include <boost/function.hpp>
@@ -19,6 +20,9 @@
 
 namespace push {
 
+    /**
+     * @brief APNS push provider
+     */
     class apns : public provider
     {
     public:
@@ -46,6 +50,35 @@ namespace push {
         
         /// error callback
         error_callback_type on_error_;
+    };
+    
+    /**
+     * @brief APNS feedback reader
+     */
+    class apns_feedback
+    {
+    public:
+        typedef push::detail
+            ::apns_feedback_connection::callback_type
+                callback_type;
+
+        apns_feedback(push_service& ps, const std::string& host, const std::string& port,
+             const std::string& cert, const std::string& priv_key, const callback_type& cb);
+
+        /// Start getting the feed
+        void start();
+        
+        /// Stop fetching and processing the feed
+        void stop();
+        
+    private:
+        push_service&  push_service_;
+        const std::string host_;
+        const std::string port_;
+        callback_type  on_feedback_;
+        
+        boost::asio::ssl::context ssl_ctx_;
+        boost::shared_ptr<push::detail::apns_feedback_connection> connection_;
     };
     
 } // namespace push

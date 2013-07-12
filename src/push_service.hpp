@@ -15,4 +15,9 @@
 #include <push/apns.hpp>
 #include <push/gcm.hpp>
 
+// error and exception handling
+#include <push/apns_errors.hpp>
+#include <push/exception/push_exception.hpp>
+#include <push/exception/apns_exception.hpp>
+
 #endif // _PUSH_SERVICE_HPP_

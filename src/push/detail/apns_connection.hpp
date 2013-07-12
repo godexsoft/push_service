@@ -24,8 +24,8 @@ namespace detail {
     class apns_connection
     {
     public:
-        typedef boost::function<void(const uint32_t&,
-            const boost::system::error_code&)> error_callback_type;
+        typedef boost::function<void(const boost::system::error_code&,
+            const uint32_t&)> error_callback_type;
         
         friend class connection_pool<apns_connection, apns_request>;
         typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket_t;

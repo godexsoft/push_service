@@ -66,7 +66,7 @@ namespace detail {
             if(on_error_)
             {
                 push::detail::apns_response resp(response_);
-                on_error_(resp.identity_, resp.to_error_code());
+                on_error_(resp.to_error_code(), resp.identity_);
             }
         }
         else if (error != boost::asio::error::eof)
@@ -113,7 +113,7 @@ namespace detail {
         }
         else
         {
-            throw push::exception::apns_exception("apns connection failde: " + error.message());
+            throw push::exception::apns_exception("apns connection failed: " + error.message());
         }
     }
     
