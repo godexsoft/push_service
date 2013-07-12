@@ -50,16 +50,7 @@ namespace push {
     uint32_t apns::post(const device& dev, const std::string& payload,
                         const uint32_t expiry, const uint32_t ident)
     {
-        /*
-        boost::shared_ptr<detail::apns_connection> con =
-            pool_.get_connection();
-
-        con->perform( boost::shared_ptr<detail::apns_request>(
-            new detail::apns_request(dev, payload, expiry, ident) ) );
-         */
-        
-        pool_.post( detail::apns_request(dev, payload, expiry, ident) );
-        
+        pool_.post( detail::apns_request(dev, payload, expiry, ident) );        
         return ident;
     }
     

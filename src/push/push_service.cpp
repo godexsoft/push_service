@@ -7,6 +7,7 @@
 //
 
 #include <push/push_service.hpp>
+#include <push/exception/push_exception.hpp>
 
 namespace push {
     
@@ -20,8 +21,8 @@ namespace push {
     {
         if( ! providers_.count(dev.provider_class))
         {
-            throw std::runtime_error(dev.provider_class +
-                " was not registered. Can't post push notification.");
+            throw push::exception::push_exception(dev.provider_class +
+                " was not registered. can't post push notification.");
         }
 
         return providers_.at(dev.provider_class)
@@ -32,8 +33,8 @@ namespace push {
     {
         if( ! providers_.count(dev.provider_class))
         {
-            throw std::runtime_error(dev.provider_class +
-                " was not registered. Can't validate device.");
+            throw push::exception::push_exception(dev.provider_class +
+                " was not registered. can't validate device.");
         }
         
         return providers_.at(dev.provider_class)->validate_device(dev);
@@ -43,7 +44,8 @@ namespace push {
     {
         if(providers_.count(provider_key))
         {
-            throw std::runtime_error(provider_key + " is already registered.");
+            throw push::exception::push_exception(
+                provider_key + " is already registered.");
         }
         
         providers_.insert( std::make_pair(provider_key, p) );

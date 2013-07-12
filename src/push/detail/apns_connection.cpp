@@ -9,6 +9,7 @@
 #include <push/detail/apns_connection.hpp>
 #include <push/detail/apns_response.hpp>
 #include <push/detail/connection_pool.hpp>
+#include <push/exception/apns_exception.hpp>
 
 namespace push {
 namespace detail {
@@ -24,7 +25,11 @@ namespace detail {
     void apns_connection::wait_for_job()
     {
         // wait on condition with timeout
-        if(!pool_.get_next_job(current_req_, boost::posix_time::milliseconds(1000)))
+        // FIXME: i don't really like this implementation detail
+        // but i don't know how to prevent async_read and other async operations
+        // from not being checked on while we are waiting here.
+        // hotfix - wait with timeout and retry if no job is there for us.
+        if(!pool_.get_next_job(current_req_, boost::posix_time::milliseconds(10)))
         {
             // try again.
             // note: this technique helps to keep the async_read going.
@@ -45,19 +50,18 @@ namespace detail {
     {
         if (error)
         {
-            std::cerr << "Write failed: " + error.message() + "\n";
-            // TODO: report
+            throw push::exception::apns_exception("write failed: " + error.message());
         }
         
         wait_for_job(); // get next job
     }
     
-    void apns_connection::handle_read_err(const boost::system::error_code& err)
+    void apns_connection::handle_read_err(const boost::system::error_code& error)
     {
         // if we got here the connection is not usable anymore.
-        // note: !err means we got some data but according to apple
+        // note: !error means we got some data but according to apple
         // they only send data when something went wrong.
-        if (!err)
+        if (!error)
         {
             if(on_error_)
             {
@@ -65,9 +69,9 @@ namespace detail {
                 on_error_(resp.identity_, resp.to_error_code());
             }
         }
-        else if (err != boost::asio::error::eof)
+        else if (error != boost::asio::error::eof)
         {
-            std::cout << "Error: " << err << "\n";
+            throw push::exception::apns_exception("read error: " + error.message());
         }
 
         // reconnect because Apple closes the socket on error
@@ -109,7 +113,7 @@ namespace detail {
         }
         else
         {
-            throw std::runtime_error("APNS connection failed: " + error.message());
+            throw push::exception::apns_exception("apns connection failde: " + error.message());
         }
     }
     
@@ -117,7 +121,7 @@ namespace detail {
     {
         if (error)
         {
-            throw std::runtime_error("APNS handshake failed: " + error.message());
+            throw push::exception::apns_exception("apns handshake failed: " + error.message());
         }
         
         // ok. connection is established. lets sit and try to read to handle any errors.

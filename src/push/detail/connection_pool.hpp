@@ -21,6 +21,8 @@
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/condition_variable.hpp>
 
+#include <push/exception/push_exception.hpp>
+
 namespace push {
 namespace detail {
 
@@ -36,7 +38,7 @@ namespace detail {
         {
             if(cnt < 1)
             {
-                throw std::runtime_error("connection_pool must specify 1 or more as connections count.");
+                throw push::exception::push_exception("connection_pool must specify 1 or more as connections count.");
             }
             
             for(uint32_t i = 0; i<cnt; ++i)

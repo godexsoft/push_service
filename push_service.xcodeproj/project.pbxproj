@@ -16,6 +16,8 @@
 		242E7027178EB35500C9AD10 /* apns_response.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E7025178EB35400C9AD10 /* apns_response.hpp */; };
 		242E702A178F23C000C9AD10 /* apns_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E7028178F23C000C9AD10 /* apns_errors.cpp */; };
 		242E702B178F23C000C9AD10 /* apns_errors.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E7029178F23C000C9AD10 /* apns_errors.hpp */; };
+		242E702E178FFEC200C9AD10 /* push_exception.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E702D178FFEC200C9AD10 /* push_exception.hpp */; };
+		242E7030178FFFDC00C9AD10 /* apns_exception.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E702F178FFFDC00C9AD10 /* apns_exception.hpp */; };
 		24D4E192178863B6007E9D6C /* push_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E190178863B6007E9D6C /* push_service.cpp */; };
 		24D4E19B178863DC007E9D6C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E19A178863DC007E9D6C /* main.cpp */; };
 		24D4E1A317886EE9007E9D6C /* libpush_service.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E18717886344007E9D6C /* libpush_service.a */; };
@@ -64,6 +66,8 @@
 		242E7025178EB35400C9AD10 /* apns_response.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_response.hpp; sourceTree = "<group>"; };
 		242E7028178F23C000C9AD10 /* apns_errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns_errors.cpp; sourceTree = "<group>"; };
 		242E7029178F23C000C9AD10 /* apns_errors.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_errors.hpp; sourceTree = "<group>"; };
+		242E702D178FFEC200C9AD10 /* push_exception.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = push_exception.hpp; sourceTree = "<group>"; };
+		242E702F178FFFDC00C9AD10 /* apns_exception.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_exception.hpp; sourceTree = "<group>"; };
 		24D4E18717886344007E9D6C /* libpush_service.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpush_service.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E18F17886372007E9D6C /* push_service.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = push_service.hpp; sourceTree = "<group>"; };
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
@@ -124,6 +128,15 @@
 			name = public;
 			sourceTree = "<group>";
 		};
+		242E702C178FFE6D00C9AD10 /* exception */ = {
+			isa = PBXGroup;
+			children = (
+				242E702F178FFFDC00C9AD10 /* apns_exception.hpp */,
+				242E702D178FFEC200C9AD10 /* push_exception.hpp */,
+			);
+			path = exception;
+			sourceTree = "<group>";
+		};
 		24D4E17E17886344007E9D6C = {
 			isa = PBXGroup;
 			children = (
@@ -164,9 +177,10 @@
 		24D4E1AB178874C0007E9D6C /* api */ = {
 			isa = PBXGroup;
 			children = (
+				242E702C178FFE6D00C9AD10 /* exception */,
+				24D4E1B4178AF685007E9D6C /* detail */,
 				242E7028178F23C000C9AD10 /* apns_errors.cpp */,
 				242E7029178F23C000C9AD10 /* apns_errors.hpp */,
-				24D4E1B4178AF685007E9D6C /* detail */,
 				24D4E18F17886372007E9D6C /* push_service.hpp */,
 				24D4E190178863B6007E9D6C /* push_service.cpp */,
 				24D4E1A717887320007E9D6C /* push_provider.cpp */,
@@ -209,6 +223,8 @@
 				242E7020178C54DB00C9AD10 /* push_service.hpp in Headers */,
 				242E7027178EB35500C9AD10 /* apns_response.hpp in Headers */,
 				242E702B178F23C000C9AD10 /* apns_errors.hpp in Headers */,
+				242E702E178FFEC200C9AD10 /* push_exception.hpp in Headers */,
+				242E7030178FFFDC00C9AD10 /* apns_exception.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
