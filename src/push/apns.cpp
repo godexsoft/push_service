@@ -22,11 +22,11 @@ namespace push {
     
     apns::apns(push_service& ps, const std::string& host, const std::string& port,
                const std::string& cert, const std::string& priv_key,
-               const error_callback_type& cb)
+               const callback_type& cb)
     : provider(ps, apns::key)
     , pool_(ps.get_io_service(), 4) // TODO: hardcoded for now. remove
     , ssl_ctx_(ssl::context::sslv23)
-    , on_error_(cb)
+    , callback_(cb)
     {
         ip::tcp::resolver resolver(ps.get_io_service());
         ip::tcp::resolver::query query(host, port);
@@ -39,7 +39,7 @@ namespace push {
         ssl_ctx_.use_private_key_file(priv_key, ssl::context::pem);
         ssl_ctx_.use_certificate_file(cert, ssl::context::pem);
         
-        pool_.start(ssl_ctx_, iterator, on_error_);
+        pool_.start(ssl_ctx_, iterator, callback_);
     }
     
     bool apns::validate_device(const device& dev) const

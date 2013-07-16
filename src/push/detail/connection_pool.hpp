@@ -20,6 +20,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/optional.hpp>
 
 #include <push/exception/push_exception.hpp>
 
@@ -30,8 +31,8 @@ namespace detail {
     class connection_pool
     {
     public:
-        typedef apns_connection::error_callback_type
-            error_callback_type;
+        typedef apns_connection::callback_type
+            callback_type;
         
         connection_pool(boost::asio::io_service& io, const uint32_t cnt)
         : callback_io_(io)
@@ -63,7 +64,7 @@ namespace detail {
 
         void start(boost::asio::ssl::context& context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
-                   const error_callback_type& cb)
+                   const callback_type& cb)
         {
             std::for_each(connections_.begin(), connections_.end(),
                 boost::bind(&T::start, _1, &context, iterator, callback_io_.wrap(cb) ) );
@@ -72,28 +73,42 @@ namespace detail {
         void post(const J& job)
         {
             {
-                boost::lock_guard<boost::mutex> lock(mutex_);
+                boost::unique_lock<boost::mutex> lock(mutex_);
                 jobs_.push(job);
             }
 
             condition_.notify_one();
         }
 
-        bool get_next_job(J& req, const boost::posix_time::time_duration& timeout)
+        template<typename I>
+        void post(I& begin, const I& end)
+        {
+            boost::unique_lock<boost::mutex> lock(mutex_);
+
+            for(; begin != end; ++begin)
+            {
+                jobs_.push(*begin);
+            }
+            
+            condition_.notify_all();
+        }
+
+        
+        boost::optional<J> get_next_job(const boost::posix_time::time_duration& timeout)
         {
             boost::unique_lock<boost::mutex> lock(mutex_);
             while(jobs_.empty())
             {
                 if(!condition_.timed_wait(lock, timeout))
                 {
-                    return false;
+                    return boost::optional<J>();
                 }
             }
             
-            req = jobs_.front();
+            boost::optional<J> ret(jobs_.front());
             jobs_.pop();
             
-            return true;
+            return ret;
         }
         
     private:

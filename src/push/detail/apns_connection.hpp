@@ -13,8 +13,10 @@
 #include <boost/asio/ssl.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <deque>
 
 #include <push/detail/apns_request.hpp>
+#include <push/detail/apns_response.hpp>
 
 namespace push {
 namespace detail {
@@ -25,7 +27,10 @@ namespace detail {
     {
     public:
         typedef boost::function<void(const boost::system::error_code&,
-            const uint32_t&)> error_callback_type;
+            const uint32_t&)> callback_type;
+        
+        typedef connection_pool<apns_connection, apns_request>
+            pool_type;
         
         friend class connection_pool<apns_connection, apns_request>;
         typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket_t;
@@ -34,9 +39,13 @@ namespace detail {
 
         void start(boost::asio::ssl::context* const context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
-                   const error_callback_type& cb);
+                   const callback_type& cb);
         
     private:
+        void sort_cache_on_error(const push::detail::apns_response& resp);
+        void reset_cache_checker();
+        void on_check_cache(const boost::system::error_code& err);
+        
         boost::asio::io_service& get_io_service();
         void stop();    
         
@@ -49,9 +58,10 @@ namespace detail {
         
         boost::asio::io_service         io_service_;
         boost::asio::io_service::work   work_;
+        boost::asio::deadline_timer     cache_check_timer_;
 
         boost::shared_ptr<ssl_socket_t> socket_;
-        connection_pool<apns_connection, apns_request>& pool_;
+        pool_type& pool_;
         
         // FIXME: pointers are not very nice. however, the connection object MUST
         // outlive the connection_pool and the holder of connection pool by design.
@@ -61,8 +71,9 @@ namespace detail {
         
         apns_request current_req_;
         boost::asio::streambuf response_;
+        std::deque<apns_request> cache_;
         
-        error_callback_type on_error_;
+        callback_type callback_;
     };
 
 } // namespace detail

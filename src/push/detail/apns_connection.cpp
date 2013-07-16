@@ -7,9 +7,10 @@
 //
 
 #include <push/detail/apns_connection.hpp>
-#include <push/detail/apns_response.hpp>
 #include <push/detail/connection_pool.hpp>
 #include <push/exception/apns_exception.hpp>
+
+#include <boost/iterator/indirect_iterator.hpp>
 
 namespace push {
 namespace detail {
@@ -18,6 +19,7 @@ namespace detail {
     
     apns_connection::apns_connection(connection_pool<apns_connection, apns_request>& pool)
     : work_(io_service_)
+    , cache_check_timer_(io_service_)
     , pool_(pool)
     {
     }
@@ -29,7 +31,10 @@ namespace detail {
         // but i don't know how to prevent async_read and other async operations
         // from not being checked on while we are waiting here.
         // hotfix - wait with timeout and retry if no job is there for us.
-        if(!pool_.get_next_job(current_req_, boost::posix_time::milliseconds(10)))
+        boost::optional<apns_request> job =
+            pool_.get_next_job(boost::posix_time::milliseconds(10));
+        
+        if(!job)
         {
             // try again.
             // note: this technique helps to keep the async_read going.
@@ -37,6 +42,10 @@ namespace detail {
         }
         else
         {
+            // got new job. add it to cache.. request time resets automatically.
+            current_req_ = *job;
+            cache_.push_back(current_req_);
+            
             async_write(*socket_,
                 buffer(current_req_.body_, current_req_.len_),
                 boost::bind(&apns_connection::handle_write, this,
@@ -48,43 +57,98 @@ namespace detail {
     void apns_connection::handle_write(const boost::system::error_code& error,
                                        size_t bytes_transferred)
     {
-        if (error)
+        if (error) // ssl error
         {
-            throw push::exception::apns_exception("write failed: " + error.message());
+            // this happens when socket is closed
+            // FIXME: safe to ignore?
+            return;
         }
         
         wait_for_job(); // get next job
     }
     
+    void apns_connection::sort_cache_on_error(const push::detail::apns_response& resp)
+    {
+        std::deque<apns_request>::iterator it =
+            std::find_if(cache_.begin(), cache_.end(),
+                boost::bind(&apns_request::get_identity, _1)
+                    == resp.get_identity() );
+        
+        if(it != cache_.end())
+        {
+            // consider all before this one - success
+            if(callback_)
+            {
+                std::for_each(cache_.begin(), it,
+                    boost::bind(callback_, boost::system::error_code(),
+                        boost::bind(&apns_request::get_identity, _1)) );
+            }
+            
+            // and now remove them
+            cache_.erase(cache_.begin(), it);
+            
+            // report error
+            if(callback_)
+            {
+                callback_(resp.to_error_code(), resp.get_identity());
+            }
+
+            // remove the errorneous item
+            it = cache_.erase(it);
+            
+            // now for all the rest - enque them back into the pool
+            pool_.post(it, cache_.end());
+            
+            // and finally clear the cache
+            cache_.clear();
+        }
+        else
+        {
+            if(callback_)
+            {
+                callback_(resp.to_error_code(), resp.get_identity());
+            }
+            
+            // should not happen often or at all if the check_time is big enough
+            throw push::exception::apns_exception("lost failed APNS message in cache");
+        }
+    }
+    
     void apns_connection::handle_read_err(const boost::system::error_code& error)
     {
+        cache_check_timer_.cancel();
+        
         // if we got here the connection is not usable anymore.
         // note: !error means we got some data but according to apple
         // they only send data when something went wrong.
         if (!error)
         {
-            if(on_error_)
+            push::detail::apns_response resp(response_);
+
+            if(resp.to_error_code() == push::error::shutdown)
             {
-                push::detail::apns_response resp(response_);
-                on_error_(resp.to_error_code(), resp.identity_);
+                // TODO: handle inside the connection. without notifying the user            
             }
+            
+            // sort out the cache and error
+            sort_cache_on_error(resp);
         }
         else if (error != boost::asio::error::eof)
         {
             throw push::exception::apns_exception("read error: " + error.message());
         }
-
+                
         // reconnect because Apple closes the socket on error
-        start(ssl_ctx_, resolved_iterator_, on_error_);
+        start(ssl_ctx_, resolved_iterator_, callback_);
     }
     
     void apns_connection::start(ssl::context* const context,
                                 ip::tcp::resolver::iterator iterator,
-                                const error_callback_type& cb)
+                                const callback_type& cb)
     {
         ssl_ctx_ = context; // can't copy so has to be pointer
         resolved_iterator_ = iterator; // copy is fine
-        on_error_ = cb;
+        callback_ = cb;
         
         socket_ = boost::shared_ptr<ssl_socket_t>( new ssl_socket_t(io_service_, *context) );
         
@@ -127,19 +191,60 @@ namespace detail {
         // ok. connection is established. lets sit and try to read to handle any errors.
         // note: this async_read will not block the connection and client's possibility
         // to push messages over this pipe.
-        // read the answer if any
         async_read(*socket_, response_,
-            transfer_at_least(6), // exactly six bytes must be set for a valid reply
+            transfer_exactly(6), // exactly six bytes must be set for a valid reply
             boost::bind(&apns_connection::handle_read_err, this,
                 placeholders::error));
         
         // finally, allow clients to (re)use this connection.
+        reset_cache_checker();
         wait_for_job();
     }
     
     boost::asio::io_service& apns_connection::get_io_service()
     {
         return io_service_;
+    }
+    
+    void apns_connection::reset_cache_checker()
+    {
+        cache_check_timer_.expires_from_now(boost::posix_time::seconds(1));
+        cache_check_timer_.async_wait(
+            boost::bind(&apns_connection::on_check_cache,
+                this, boost::asio::placeholders::error));
+    }
+    
+    void apns_connection::on_check_cache(const boost::system::error_code& err)
+    {
+        if(err != boost::asio::error::operation_aborted)
+        {
+            boost::posix_time::ptime now( boost::posix_time::microsec_clock::local_time());
+            boost::posix_time::ptime check_time = now - boost::posix_time::seconds(120); // TODO: configurable amount
+            
+            std::deque<apns_request>::iterator it = cache_.begin();
+            
+            while(! cache_.empty())
+            {
+                if(it->get_time() < check_time)
+                {
+                    if(callback_)
+                    {
+                        callback_(boost::system::error_code(), it->get_identity());
+                    }
+                    
+                    // remove this item
+                    it = cache_.erase(it);
+                }
+                else
+                {
+                    // leave the rest of the cache for now
+                    break;
+                }
+            }
+
+            // in a normal situation we want this to go on
+            reset_cache_checker();
+        }
     }
     
     void apns_connection::stop()

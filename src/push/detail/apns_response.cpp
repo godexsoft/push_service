@@ -19,6 +19,9 @@ namespace detail {
     {
         boost::asio::streambuf::const_buffers_type bufs = data.data();
         std::string s(boost::asio::buffers_begin(bufs), boost::asio::buffers_begin(bufs) + 6);
+
+        // consume the 6 bytes
+        data.consume(6);
         
         char* p = &s.at(0);
         

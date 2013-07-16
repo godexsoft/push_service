@@ -28,14 +28,14 @@ namespace push {
     public:
         typedef push::detail::connection_pool<
             detail::apns_connection,detail::apns_request>
-                ::error_callback_type
-                    error_callback_type;
+                ::callback_type
+                    callback_type;
         
         static const char* key;
         
         apns(push_service& ps, const std::string& host, const std::string& port,
              const std::string& cert, const std::string& priv_key,
-             const error_callback_type& cb = error_callback_type());
+             const callback_type& cb = callback_type());
         
         bool validate_device(const device& dev) const;
         
@@ -48,8 +48,8 @@ namespace push {
             push::detail::apns_request> pool_;
         boost::asio::ssl::context ssl_ctx_;
         
-        /// error callback
-        error_callback_type on_error_;
+        /// callback
+        callback_type callback_;
     };
     
     /**

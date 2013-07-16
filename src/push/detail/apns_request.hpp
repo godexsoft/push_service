@@ -12,6 +12,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace push {
     
@@ -26,10 +27,19 @@ namespace detail {
 
         apns_request();
         
+        apns_request(const apns_request& r);
+        
         apns_request(const device& dev, const std::string& payload,
                      const uint32_t expiry, const uint32_t ident);
-
+        
+        const uint32_t get_identity() const;
+        
+        const boost::posix_time::ptime get_time() const;
+        
     private:
+        uint32_t ident_;
+        boost::posix_time::ptime time_;
+        
         boost::array<char, 1024> body_;
         long len_;
     };

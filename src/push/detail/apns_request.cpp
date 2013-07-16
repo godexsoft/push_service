@@ -18,8 +18,17 @@ namespace detail {
     {
     }
     
+    apns_request::apns_request(const apns_request& r)
+    : ident_(r.ident_)
+    , time_(boost::posix_time::microsec_clock::local_time()) // set to now
+    , body_(r.body_)
+    , len_(r.len_)
+    {        
+    }
+    
     apns_request::apns_request(const device& dev, const std::string& payload,
-                               const uint32_t expiry, const uint32_t ident)    
+                               const uint32_t expiry, const uint32_t ident)
+    : ident_(ident)
     {
         char cmd = 1;
         int16_t token_len = htons(32);
@@ -55,5 +64,15 @@ namespace detail {
         memcpy(body_.elems, buf, len_);
     }
 
+    const uint32_t apns_request::get_identity() const
+    {
+        return ident_;
+    }
+
+    const boost::posix_time::ptime apns_request::get_time() const
+    {
+        return time_;
+    }
+        
 } // namespace detail
 } // namespace push
