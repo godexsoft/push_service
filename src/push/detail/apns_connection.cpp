@@ -10,14 +10,12 @@
 #include <push/detail/connection_pool.hpp>
 #include <push/exception/apns_exception.hpp>
 
-#include <boost/iterator/indirect_iterator.hpp>
-
 namespace push {
 namespace detail {
 
     using namespace boost::asio;
     
-    apns_connection::apns_connection(connection_pool<apns_connection, apns_request>& pool)
+    apns_connection::apns_connection(pool_type& pool)
     : work_(io_service_)
     , cache_check_timer_(io_service_)
     , pool_(pool)

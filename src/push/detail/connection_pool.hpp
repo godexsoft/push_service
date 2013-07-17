@@ -31,7 +31,7 @@ namespace detail {
     class connection_pool
     {
     public:
-        typedef apns_connection::callback_type
+        typedef typename T::callback_type
             callback_type;
         
         connection_pool(boost::asio::io_service& io, const uint32_t cnt)
@@ -94,14 +94,22 @@ namespace detail {
         }
 
         
-        boost::optional<J> get_next_job(const boost::posix_time::time_duration& timeout)
+        boost::optional<J> get_next_job(const boost::posix_time::time_duration&
+                                        timeout = boost::posix_time::not_a_date_time)
         {
             boost::unique_lock<boost::mutex> lock(mutex_);
             while(jobs_.empty())
             {
-                if(!condition_.timed_wait(lock, timeout))
+                if(timeout == boost::posix_time::not_a_date_time)
                 {
-                    return boost::optional<J>();
+                    condition_.wait(lock);
+                }
+                else
+                {
+                    if(!condition_.timed_wait(lock, timeout))
+                    {
+                        return boost::optional<J>();
+                    }
                 }
             }
             
