@@ -97,6 +97,8 @@ namespace detail {
         
         void disconnect(const uint64_t& ident)
         {
+            boost::lock_guard<boost::mutex> l(mutex_);
+            
             // FIXME: there must be a much more efficient way to do this
             waiters_.erase(
                 std::remove_if(waiters_.begin(), waiters_.end(),
