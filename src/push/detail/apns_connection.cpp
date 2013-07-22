@@ -24,19 +24,25 @@ namespace detail {
 
     void apns_connection::wait_for_job()
     {
-        // wait on condition with timeout
-        // FIXME: i don't really like this implementation detail
-        // but i don't know how to prevent async_read and other async operations
-        // from not being checked on while we are waiting here.
-        // hotfix - wait with timeout and retry if no job is there for us.
-        boost::optional<apns_request> job =
-            pool_.get_next_job(boost::posix_time::milliseconds(10));
+        // schedule async job retrieval.
+        // note: the old handle, if any, will be destroyed
+        // and the async_condition_variable waiter will be disconnected.
+        wait_handle_ =
+            pool_.async_wait_for_job(
+                boost::bind(&apns_connection::handle_job_available, this));
+    }
+
+    void apns_connection::handle_job_available()
+    {
+        boost::optional<apns_request> job = pool_.get_next_job();
         
+        // there is always chance that we will not get a job
+        // because another connection worker was faster.
+        // using notify_one this should be a minimal chance however.
         if(!job)
         {
-            // try again.
-            // note: this technique helps to keep the async_read going.
-            io_service_.post(boost::bind(&apns_connection::wait_for_job, this));
+            // schedule again if no job available
+            wait_for_job();
         }
         else
         {

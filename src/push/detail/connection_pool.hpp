@@ -23,6 +23,7 @@
 #include <boost/optional.hpp>
 
 #include <push/exception/push_exception.hpp>
+#include <push/detail/async_condition_variable.hpp>
 
 namespace push {
 namespace detail {
@@ -36,6 +37,7 @@ namespace detail {
         
         connection_pool(boost::asio::io_service& io, const uint32_t cnt)
         : callback_io_(io)
+        , condition_(io)
         {
             if(cnt < 1)
             {
@@ -93,30 +95,24 @@ namespace detail {
             condition_.notify_all();
         }
 
+        async_condition_variable::handle_type
+        async_wait_for_job(const boost::function<void()>& cb)
+        {
+            return condition_.async_wait(cb);
+        }
         
-        boost::optional<J> get_next_job(const boost::posix_time::time_duration&
-                                        timeout = boost::posix_time::not_a_date_time)
+        boost::optional<J> get_next_job()
         {
             boost::unique_lock<boost::mutex> lock(mutex_);
-            while(jobs_.empty())
+            if(!jobs_.empty())
             {
-                if(timeout == boost::posix_time::not_a_date_time)
-                {
-                    condition_.wait(lock);
-                }
-                else
-                {
-                    if(!condition_.timed_wait(lock, timeout))
-                    {
-                        return boost::optional<J>();
-                    }
-                }
+                boost::optional<J> ret(jobs_.front());
+                jobs_.pop();
+                
+                return ret;
             }
             
-            boost::optional<J> ret(jobs_.front());
-            jobs_.pop();
-            
-            return ret;
+            return boost::optional<J>();
         }
         
     private:
@@ -129,8 +125,8 @@ namespace detail {
         /// All available connections
         std::vector<boost::shared_ptr<T> > connections_;
 
-        boost::mutex                mutex_;
-        boost::condition_variable   condition_;
+        boost::mutex                       mutex_;
+        detail::async_condition_variable   condition_;
         
         /// Requests to process
         std::queue<J> jobs_;

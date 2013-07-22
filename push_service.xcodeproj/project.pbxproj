@@ -24,6 +24,7 @@
 		242E70381797182500C9AD10 /* gcm_request.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E70361797182500C9AD10 /* gcm_request.hpp */; };
 		242E703D1797190100C9AD10 /* gcm_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E703B1797190100C9AD10 /* gcm_connection.cpp */; };
 		242E703E1797190100C9AD10 /* gcm_connection.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E703C1797190100C9AD10 /* gcm_connection.hpp */; };
+		242E70401797811600C9AD10 /* async_condition_variable.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E703F1797811500C9AD10 /* async_condition_variable.hpp */; };
 		24D4E192178863B6007E9D6C /* push_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E190178863B6007E9D6C /* push_service.cpp */; };
 		24D4E19B178863DC007E9D6C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E19A178863DC007E9D6C /* main.cpp */; };
 		24D4E1A317886EE9007E9D6C /* libpush_service.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E18717886344007E9D6C /* libpush_service.a */; };
@@ -80,6 +81,7 @@
 		242E70361797182500C9AD10 /* gcm_request.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_request.hpp; sourceTree = "<group>"; };
 		242E703B1797190100C9AD10 /* gcm_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm_connection.cpp; sourceTree = "<group>"; };
 		242E703C1797190100C9AD10 /* gcm_connection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_connection.hpp; sourceTree = "<group>"; };
+		242E703F1797811500C9AD10 /* async_condition_variable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = async_condition_variable.hpp; sourceTree = "<group>"; };
 		24D4E18717886344007E9D6C /* libpush_service.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpush_service.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E18F17886372007E9D6C /* push_service.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = push_service.hpp; sourceTree = "<group>"; };
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 				242E70391797182E00C9AD10 /* gcm */,
 				242E703A1797183600C9AD10 /* apns */,
 				F44B202B92528F8F9F233C67 /* connection_pool.hpp */,
+				242E703F1797811500C9AD10 /* async_condition_variable.hpp */,
 			);
 			path = detail;
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 				242E70341790105B00C9AD10 /* apns_feedback_connection.hpp in Headers */,
 				242E70381797182500C9AD10 /* gcm_request.hpp in Headers */,
 				242E703E1797190100C9AD10 /* gcm_connection.hpp in Headers */,
+				242E70401797811600C9AD10 /* async_condition_variable.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,6 +17,7 @@
 
 #include <push/detail/apns_request.hpp>
 #include <push/detail/apns_response.hpp>
+#include <push/detail/async_condition_variable.hpp>
 
 namespace push {
 namespace detail {
@@ -49,7 +50,8 @@ namespace detail {
         boost::asio::io_service& get_io_service();
         void stop();    
         
-        void wait_for_job();        
+        void wait_for_job();
+        void handle_job_available();
         bool verify_cert(bool accept_any, boost::asio::ssl::verify_context& ctx);
         void handle_connect(const boost::system::error_code& error);        
         void handle_handshake(const boost::system::error_code& error);
@@ -73,7 +75,8 @@ namespace detail {
         boost::asio::streambuf response_;
         std::deque<apns_request> cache_;
         
-        callback_type callback_;
+        callback_type callback_;        
+        async_condition_variable::handle_type wait_handle_;
     };
 
 } // namespace detail
