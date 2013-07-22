@@ -20,24 +20,22 @@ namespace push {
 
     using namespace boost::asio;
     
-    apns::apns(push_service& ps, const std::string& host, const std::string& port,
-               const std::string& cert, const std::string& priv_key,
-               const callback_type& cb)
+    apns::apns(push_service& ps, const config& cfg)
     : provider(ps, apns::key)
-    , pool_(ps.get_io_service(), 4) // TODO: hardcoded for now. remove
+    , pool_(ps.get_io_service(), cfg.pool_size)
     , ssl_ctx_(ssl::context::sslv23)
-    , callback_(cb)
+    , callback_(cfg.callback)
     {
         ip::tcp::resolver resolver(ps.get_io_service());
-        ip::tcp::resolver::query query(host, port);
+        ip::tcp::resolver::query query(cfg.host, cfg.port);
         ip::tcp::resolver::iterator iterator = resolver.resolve(query);
         
         ssl_ctx_.set_options(ssl::context::default_workarounds
                              | ssl::context::no_sslv2
                              | ssl::context::single_dh_use);
         
-        ssl_ctx_.use_private_key_file(priv_key, ssl::context::pem);
-        ssl_ctx_.use_certificate_file(cert, ssl::context::pem);
+        ssl_ctx_.use_private_key_file(cfg.private_key, ssl::context::pem);
+        ssl_ctx_.use_certificate_file(cfg.certificate, ssl::context::pem);
         
         pool_.start(ssl_ctx_, iterator, callback_);
     }
@@ -57,21 +55,19 @@ namespace push {
     const char* apns::key = "apns";
     
     
-    apns_feedback::apns_feedback(push_service& ps, const std::string& host,
-                                 const std::string& port, const std::string& cert,
-                                 const std::string& priv_key, const callback_type& cb)
+    apns_feedback::apns_feedback(push_service& ps, const config& cfg)
     : push_service_(ps)
-    , host_(host)
-    , port_(port)
+    , host_(cfg.host)
+    , port_(cfg.port)
     , ssl_ctx_(ssl::context::sslv23)
-    , on_feedback_(cb)
+    , on_feedback_(cfg.callback)
     {
         ssl_ctx_.set_options(ssl::context::default_workarounds
                              | ssl::context::no_sslv2
                              | ssl::context::single_dh_use);
         
-        ssl_ctx_.use_private_key_file(priv_key, ssl::context::pem);
-        ssl_ctx_.use_certificate_file(cert, ssl::context::pem);
+        ssl_ctx_.use_private_key_file(cfg.private_key, ssl::context::pem);
+        ssl_ctx_.use_certificate_file(cfg.certificate, ssl::context::pem);
     }
     
     void apns_feedback::start()

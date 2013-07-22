@@ -82,6 +82,7 @@
 		242E703B1797190100C9AD10 /* gcm_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm_connection.cpp; sourceTree = "<group>"; };
 		242E703C1797190100C9AD10 /* gcm_connection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_connection.hpp; sourceTree = "<group>"; };
 		242E703F1797811500C9AD10 /* async_condition_variable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = async_condition_variable.hpp; sourceTree = "<group>"; };
+		24C24B13179DB5DA0095E499 /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util.hpp; sourceTree = "<group>"; };
 		24D4E18717886344007E9D6C /* libpush_service.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpush_service.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E18F17886372007E9D6C /* push_service.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = push_service.hpp; sourceTree = "<group>"; };
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
@@ -209,6 +210,7 @@
 		24D4E199178863DC007E9D6C /* test */ = {
 			isa = PBXGroup;
 			children = (
+				24C24B13179DB5DA0095E499 /* util.hpp */,
 				24D4E19A178863DC007E9D6C /* main.cpp */,
 			);
 			path = test;

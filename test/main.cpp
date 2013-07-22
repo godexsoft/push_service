@@ -10,6 +10,10 @@
 #include <boost/thread.hpp>
 
 #include <push_service.hpp>
+#include <push/detail/async_condition_variable.hpp>
+#include <boost/thread/condition_variable.hpp>
+
+#include "util.hpp"
 
 using namespace boost::asio;
 using namespace boost;
@@ -53,7 +57,7 @@ void on_timer_good(deadline_timer& t, push_service& ps)
     ps.post(dev1, "{\"aps\" : {\"alert\":\"Valid\"}}", 1, count++);
     
     // reset timer
-    t.expires_from_now(posix_time::millisec(10));
+    t.expires_from_now(posix_time::millisec(1));
     t.async_wait(boost::bind(&on_timer_good, boost::ref(t), boost::ref(ps)));
 }
 
@@ -65,44 +69,61 @@ void on_timer_bad(deadline_timer& t, push_service& ps)
     ps.post(dev1, "", 1, count++);
     
     // reset timer
-    t.expires_from_now(posix_time::seconds(1));
+    t.expires_from_now(posix_time::millisec(10));
     t.async_wait(boost::bind(&on_timer_bad, boost::ref(t), boost::ref(ps)));
 }
 
 int main(int argc, const char * argv[])
 {
-    io_service       io;
-    push_service     ps(io);
-
-    io_service::work w(io); // don't you dare die on me
-    
     try
     {
-        apns apple_push(ps,
-            "gateway.sandbox.push.apple.com",      // Host for APNS
-            "2195",                                // Port for APNS
-            "/tmp/cert.pem",                       // Certificate path (PEM format)
-            "/tmp/key.pem",                        // Private key path (PEM format)
-            boost::bind(&on_apns, _1, _2) );       // Error reporting callback (optional)
+        io_service       io;
+        push_service     ps(io);        
+        io_service::work w(io); // don't you dare die on me
+        
+        // configure apns for sandbox mode
+        apns::config apple_dev(
+           apns::config::sandbox(
+               "/tmp/cert.pem",                       // Certificate path (PEM format)
+               "/tmp/key.pem"                         // Private key path (PEM format)
+           )
+        );
+        
+        apple_dev.callback =
+            boost::bind(&on_apns, _1, _2);            // Optional. defaults to no callback        
+        apple_dev.pool_size = 8;                      // Optional. defaults to 4
+        
+        // create the apns push service runner
+        apns apple_push(ps, apple_dev);
+ 
+        // configure apns feedback for sandbox mode
+        apns_feedback::config apple_dev_feed(
+            apns_feedback::config::sandbox(
+                "/tmp/cert.pem",                      // Certificate path (PEM format)
+                "/tmp/key.pem"                        // Private key path (PEM format)
+            )
+        );
+        
+        apple_dev_feed.callback =
+            boost::bind(&on_feed, _1, _2, _3);
+        
+        // create the apns feedback listener
+        apns_feedback apple_feedback(ps, apple_dev_feed);
 
-        apns_feedback apple_feedback(ps,
-            "feedback.sandbox.push.apple.com",     // Host for APNS feedback
-            "2196",                                // Port for APNS feedback
-            "/tmp/cert.pem",                       // Certificate path (PEM format)
-            "/tmp/key.pem",                        // Private key path (PEM format)
-            boost::bind(&on_feed, _1, _2, _3) );   // Callback
+        // and start getting the feed
+        apple_feedback.start();
         
-        apple_feedback.start(); // start getting the feed
-        
+        // test some message dispatching
         deadline_timer t1(io);
         deadline_timer t2(io);
-
-        // normal message every 10 ms
-        t1.expires_from_now(posix_time::millisec(10));
+  
+        // normal message every 1 ms
+        t1.expires_from_now(posix_time::millisec(1));
         t1.async_wait(boost::bind(&on_timer_good, boost::ref(t1), boost::ref(ps)));
         
-        // bad message every second
-        t2.expires_from_now(posix_time::seconds(1));
+        
+        // bad message every 10 ms
+        t2.expires_from_now(posix_time::millisec(10));
         t2.async_wait(boost::bind(&on_timer_bad, boost::ref(t2), boost::ref(ps)));
         
         io.run();

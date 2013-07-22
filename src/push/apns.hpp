@@ -26,16 +26,60 @@ namespace push {
     class apns : public provider
     {
     public:
+        
         typedef push::detail::connection_pool<
             detail::apns_connection,detail::apns_request>
                 ::callback_type
                     callback_type;
         
+        /**
+         * @brief configuration helper
+         */
+        struct config
+        {
+            std::string     host;
+            std::string     port;
+            std::string     certificate;
+            std::string     private_key;
+            uint16_t        pool_size;
+            callback_type   callback;
+            
+            config(const std::string& h, const std::string& p,
+                   const std::string& crt, const std::string& pk)
+            : host(h)
+            , port(p)
+            , certificate(crt)
+            , private_key(pk)
+            , pool_size(4)
+            {
+            }
+            
+            static config sandbox(const std::string& crt,
+                                  const std::string& pk)
+            {
+                return config(
+                    "gateway.sandbox.push.apple.com",  
+                    "2195",
+                    crt,
+                    pk
+                );
+            }
+            
+            static config production(const std::string& crt,
+                                     const std::string& pk)
+            {
+                return config(
+                    "gateway.push.apple.com",
+                    "2195",
+                    crt,
+                    pk
+                );
+            }
+        };        
+        
         static const char* key;
         
-        apns(push_service& ps, const std::string& host, const std::string& port,
-             const std::string& cert, const std::string& priv_key,
-             const callback_type& cb = callback_type());
+        apns(push_service& ps, const config& cfg);
         
         bool validate_device(const device& dev) const;
         
@@ -62,8 +106,50 @@ namespace push {
             ::apns_feedback_connection::callback_type
                 callback_type;
 
-        apns_feedback(push_service& ps, const std::string& host, const std::string& port,
-             const std::string& cert, const std::string& priv_key, const callback_type& cb);
+        /**
+         * @brief configuration helper
+         */
+        struct config
+        {
+            std::string     host;
+            std::string     port;
+            std::string     certificate;
+            std::string     private_key;
+            callback_type   callback;
+            
+            config(const std::string& h, const std::string& p,
+                   const std::string& crt, const std::string& pk)
+            : host(h)
+            , port(p)
+            , certificate(crt)
+            , private_key(pk)
+            {
+            }
+            
+            static config sandbox(const std::string& crt,
+                                  const std::string& pk)
+            {
+                return config(
+                    "feedback.sandbox.push.apple.com",
+                    "2196",
+                    crt,
+                    pk
+                );
+            }
+            
+            static config production(const std::string& crt,
+                                     const std::string& pk)
+            {
+                return config(
+                    "feedback.push.apple.com",
+                    "2196",
+                    crt,
+                    pk
+                );
+            }
+        };
+        
+        apns_feedback(push_service& ps, const config& cfg);
 
         /// Start getting the feed
         void start();
