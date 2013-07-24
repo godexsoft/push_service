@@ -22,12 +22,26 @@ namespace push {
         if( ! providers_.count(dev.provider_class))
         {
             throw push::exception::push_exception(dev.provider_class +
-                " was not registered. can't post push notification.");
+                " was not registered. can't post push notification from raw payload.");
         }
 
         return providers_.at(dev.provider_class)
             ->post(dev, raw_payload, expiration, ident);
     }
+    
+    uint32_t push_service::post(const device& dev, const push_message& msg,
+                                const uint32_t expiration, const uint32_t ident)
+    {
+        if( ! providers_.count(dev.provider_class))
+        {
+            throw push::exception::push_exception(dev.provider_class +
+                " was not registered. can't post push notification from message.");
+        }
+        
+        return providers_.at(dev.provider_class)
+            ->post(dev, msg, expiration, ident);
+    }
+
     
     bool push_service::validate_device(const device& dev) const
     {

@@ -13,6 +13,11 @@
 
 namespace push {
     
+    struct push_message
+    {
+        virtual std::string to_json() const = 0;
+    };
+    
     class push_service;
     
     struct device
@@ -31,6 +36,9 @@ namespace push {
         virtual bool validate_device(const device& dev) const = 0;
 
         virtual uint32_t post(const device& dev, const std::string& payload,
+                              const uint32_t expiry, const uint32_t ident) = 0;
+
+        virtual uint32_t post(const device& dev, const push_message& msg,
                               const uint32_t expiry, const uint32_t ident) = 0;
 
     private:

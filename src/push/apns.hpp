@@ -21,6 +21,35 @@
 namespace push {
 
     /**
+     * @brief APNS message wrapper
+     */
+    class apns_message : public push_message
+    {
+    public:
+        apns_message();
+        
+        // properties
+        std::string alert;
+        uint16_t badge;
+        std::string sound;
+        std::string action_loc_key;
+        std::string loc_key;
+        std::vector<std::string> loc_args;
+        std::string launch_image;
+        
+        // TODO: add support for arrays and custom hierarchies.
+        // this can be done if we implement add(ptree tree)
+        // and a wrapper: add(vector<> arr)
+        void add(const std::string& k, const std::string& v);
+        
+        std::string to_json() const;        
+        
+    private:
+        typedef std::map<std::string, std::string> custom_map_type;
+        std::map<std::string, std::string> custom_;
+    };
+    
+    /**
      * @brief APNS push provider
      */
     class apns : public provider
@@ -84,6 +113,9 @@ namespace push {
         bool validate_device(const device& dev) const;
         
         uint32_t post(const device& dev, const std::string& payload,
+                      const uint32_t expiry, const uint32_t ident);
+        
+        uint32_t post(const device& dev, const push_message& msg,
                       const uint32_t expiry, const uint32_t ident);
 
     private:

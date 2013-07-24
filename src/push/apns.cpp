@@ -16,9 +16,86 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
+#include <boost/foreach.hpp>
+
 namespace push {
 
     using namespace boost::asio;
+    using boost::property_tree::ptree;
+    using boost::property_tree::read_json;
+    using boost::property_tree::write_json;
+
+    apns_message::apns_message()
+    : badge(UINT16_MAX)
+    {
+    }
+    
+    void apns_message::add(const std::string& k, const std::string& v)
+    {
+        custom_.insert(std::make_pair(k,v));
+    }
+    
+    std::string apns_message::to_json() const
+    {
+        ptree pt;
+        
+        if(!loc_key.empty())
+        {
+            // alert is json object
+            pt.put("aps.alert.loc-key", loc_key);
+            
+            // TODO: there must be a better way to do this
+            ptree args_array;
+            BOOST_FOREACH(const std::string &arg, loc_args)
+            {
+                ptree a;
+                a.put_value(arg);
+                
+                args_array.push_back(std::make_pair("", a));
+            }
+            
+            pt.add_child("aps.alert.loc-args", args_array);
+        }
+        else if(!alert.empty())
+        {
+            // simple alert value
+            pt.put("aps.alert", alert);
+        }
+        
+        if(badge != UINT16_MAX)
+        {
+            pt.put("aps.badge", badge);
+        }
+        
+        if(!sound.empty())
+        {
+            pt.put("aps.sound", sound);
+        }
+        
+        if(!action_loc_key.empty())
+        {
+            pt.put("aps.action-loc-key", action_loc_key);
+        }
+
+        if(!launch_image.empty())
+        {
+            pt.put("aps.launch_image", launch_image);
+        }
+        
+        // add custom key-values
+        BOOST_FOREACH(const custom_map_type::value_type& p, custom_)
+        {
+            pt.put(p.first, p.second);
+        }
+        
+        std::ostringstream buf;
+        write_json (buf, pt, false);
+        return buf.str();
+    }
+    
     
     apns::apns(push_service& ps, const config& cfg)
     : provider(ps, apns::key)
@@ -50,6 +127,12 @@ namespace push {
     {
         pool_.post( detail::apns_request(dev, payload, expiry, ident) );        
         return ident;
+    }
+    
+    uint32_t apns::post(const device& dev, const push_message& msg,
+                        const uint32_t expiry, const uint32_t ident)
+    {
+        return post(dev, msg.to_json(), expiry, ident);
     }
     
     const char* apns::key = "apns";

@@ -25,6 +25,9 @@ namespace push {
         // TODO: remove ident generation, move expiration to ptime
         uint32_t post(const device& dev, const std::string& raw_payload,
                       const uint32_t expiration = 0, const uint32_t ident = 123456); // todo: random ident
+
+        uint32_t post(const device& dev, const push_message& msg,
+                      const uint32_t expiration = 0, const uint32_t ident = 123456); // todo: random ident
         
         bool validate_device(const device& dev) const;
 

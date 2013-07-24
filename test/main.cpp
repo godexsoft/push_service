@@ -54,7 +54,22 @@ void on_timer_good(deadline_timer& t, push_service& ps)
     static uint32_t count = 10000;
     
     device dev1(apns::key, base64_decode("9pfzxPgLrG/8DM8zYXcwUEId2lH0G8dq+jlkh72HXMQ="));
-    ps.post(dev1, "{\"aps\" : {\"alert\":\"Valid\"}}", 1, count++);
+    apns_message msg;
+    
+    msg.alert = "Valid";
+    msg.badge = 3;
+    msg.sound = "chime";
+    
+    msg.action_loc_key = "test";
+    msg.loc_key = "test2";
+    msg.loc_args.push_back("test12");
+    msg.loc_args.push_back("test23");
+    
+    msg.launch_image = "test.png";
+    msg.add("custom-test", "hello world"); // custom key-value
+        
+    ps.post(dev1, msg, 1, count++);
+
     
     // reset timer
     t.expires_from_now(posix_time::millisec(1));
