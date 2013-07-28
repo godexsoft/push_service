@@ -83,6 +83,18 @@
 		242E703C1797190100C9AD10 /* gcm_connection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_connection.hpp; sourceTree = "<group>"; };
 		242E703F1797811500C9AD10 /* async_condition_variable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = async_condition_variable.hpp; sourceTree = "<group>"; };
 		24C24B13179DB5DA0095E499 /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util.hpp; sourceTree = "<group>"; };
+		24C24B1E17A5865D0095E499 /* json_spirit_error_position.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_error_position.h; path = ext/json_spirit/json_spirit_error_position.h; sourceTree = "<group>"; };
+		24C24B1F17A5865D0095E499 /* json_spirit_reader_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_reader_template.h; path = ext/json_spirit/json_spirit_reader_template.h; sourceTree = "<group>"; };
+		24C24B2017A5865D0095E499 /* json_spirit_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = json_spirit_reader.cpp; path = ext/json_spirit/json_spirit_reader.cpp; sourceTree = "<group>"; };
+		24C24B2117A5865D0095E499 /* json_spirit_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_reader.h; path = ext/json_spirit/json_spirit_reader.h; sourceTree = "<group>"; };
+		24C24B2217A5865D0095E499 /* json_spirit_stream_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_stream_reader.h; path = ext/json_spirit/json_spirit_stream_reader.h; sourceTree = "<group>"; };
+		24C24B2317A5865D0095E499 /* json_spirit_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_utils.h; path = ext/json_spirit/json_spirit_utils.h; sourceTree = "<group>"; };
+		24C24B2417A5865D0095E499 /* json_spirit_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = json_spirit_value.cpp; path = ext/json_spirit/json_spirit_value.cpp; sourceTree = "<group>"; };
+		24C24B2517A5865D0095E499 /* json_spirit_value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_value.h; path = ext/json_spirit/json_spirit_value.h; sourceTree = "<group>"; };
+		24C24B2617A5865D0095E499 /* json_spirit_writer_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_writer_template.h; path = ext/json_spirit/json_spirit_writer_template.h; sourceTree = "<group>"; };
+		24C24B2717A5865D0095E499 /* json_spirit_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = json_spirit_writer.cpp; path = ext/json_spirit/json_spirit_writer.cpp; sourceTree = "<group>"; };
+		24C24B2817A5865D0095E499 /* json_spirit_writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_writer.h; path = ext/json_spirit/json_spirit_writer.h; sourceTree = "<group>"; };
+		24C24B2917A5865D0095E499 /* json_spirit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit.h; path = ext/json_spirit/json_spirit.h; sourceTree = "<group>"; };
 		24D4E18717886344007E9D6C /* libpush_service.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpush_service.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E18F17886372007E9D6C /* push_service.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = push_service.hpp; sourceTree = "<group>"; };
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
@@ -178,9 +190,37 @@
 			name = apns;
 			sourceTree = "<group>";
 		};
+		24C24B1417A585F20095E499 /* ext */ = {
+			isa = PBXGroup;
+			children = (
+				24C24B1517A585F80095E499 /* json_spirit */,
+			);
+			name = ext;
+			sourceTree = "<group>";
+		};
+		24C24B1517A585F80095E499 /* json_spirit */ = {
+			isa = PBXGroup;
+			children = (
+				24C24B1E17A5865D0095E499 /* json_spirit_error_position.h */,
+				24C24B1F17A5865D0095E499 /* json_spirit_reader_template.h */,
+				24C24B2017A5865D0095E499 /* json_spirit_reader.cpp */,
+				24C24B2117A5865D0095E499 /* json_spirit_reader.h */,
+				24C24B2217A5865D0095E499 /* json_spirit_stream_reader.h */,
+				24C24B2317A5865D0095E499 /* json_spirit_utils.h */,
+				24C24B2417A5865D0095E499 /* json_spirit_value.cpp */,
+				24C24B2517A5865D0095E499 /* json_spirit_value.h */,
+				24C24B2617A5865D0095E499 /* json_spirit_writer_template.h */,
+				24C24B2717A5865D0095E499 /* json_spirit_writer.cpp */,
+				24C24B2817A5865D0095E499 /* json_spirit_writer.h */,
+				24C24B2917A5865D0095E499 /* json_spirit.h */,
+			);
+			name = json_spirit;
+			sourceTree = "<group>";
+		};
 		24D4E17E17886344007E9D6C = {
 			isa = PBXGroup;
 			children = (
+				24C24B1417A585F20095E499 /* ext */,
 				242E7022178C74BB00C9AD10 /* linker */,
 				24D4E18E17886358007E9D6C /* src */,
 				24D4E199178863DC007E9D6C /* test */,
@@ -404,6 +444,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					"$(PROJECT_DIR)/src",
+					"$(PROJECT_DIR)/ext",
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
@@ -436,6 +477,7 @@
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
 					"$(PROJECT_DIR)/src",
+					"$(PROJECT_DIR)/ext",
 				);
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;

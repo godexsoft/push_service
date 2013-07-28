@@ -13,21 +13,18 @@
 #include <push/detail/apns_request.hpp>
 
 #include <iostream>
+#include <sstream>
+
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
+#include <json_spirit/json_spirit_writer_template.h>
 #include <boost/foreach.hpp>
 
 namespace push {
 
     using namespace boost::asio;
-    using boost::property_tree::ptree;
-    using boost::property_tree::read_json;
-    using boost::property_tree::write_json;
-
+    
     apns_message::apns_message()
     : badge(UINT16_MAX)
     {
@@ -40,60 +37,61 @@ namespace push {
     
     std::string apns_message::to_json() const
     {
-        ptree pt;
+        json_spirit::Object top_obj, aps_obj;
         
         if(!loc_key.empty())
         {
             // alert is json object
-            pt.put("aps.alert.loc-key", loc_key);
+            // and loc-args is an array
+            json_spirit::Object alert_obj;
+            json_spirit::Array arr;
             
-            // TODO: there must be a better way to do this
-            ptree args_array;
-            BOOST_FOREACH(const std::string &arg, loc_args)
-            {
-                ptree a;
-                a.put_value(arg);
-                
-                args_array.push_back(std::make_pair("", a));
-            }
+            alert_obj.push_back( json_spirit::Pair("loc-key", loc_key) );
             
-            pt.add_child("aps.alert.loc-args", args_array);
+            std::for_each(loc_args.begin(), loc_args.end(),
+                boost::bind(&json_spirit::Array::push_back, boost::ref(arr), _1) );
+            
+            alert_obj.push_back( json_spirit::Pair("loc-args", arr) );
+            aps_obj.push_back( json_spirit::Pair("alert", alert_obj) );
         }
         else if(!alert.empty())
         {
             // simple alert value
-            pt.put("aps.alert", alert);
+            aps_obj.push_back( json_spirit::Pair("alert", alert) );
         }
         
         if(badge != UINT16_MAX)
         {
-            pt.put("aps.badge", badge);
+            aps_obj.push_back( json_spirit::Pair("badge", badge) );
         }
         
         if(!sound.empty())
         {
-            pt.put("aps.sound", sound);
+            aps_obj.push_back( json_spirit::Pair("sound", sound) );
         }
         
         if(!action_loc_key.empty())
         {
-            pt.put("aps.action-loc-key", action_loc_key);
+            aps_obj.push_back( json_spirit::Pair("action-loc-key", action_loc_key) );
         }
 
         if(!launch_image.empty())
         {
-            pt.put("aps.launch_image", launch_image);
+            aps_obj.push_back( json_spirit::Pair("launch_image", launch_image) );
         }
         
         // add custom key-values
         BOOST_FOREACH(const custom_map_type::value_type& p, custom_)
         {
-            pt.put(p.first, p.second);
+            top_obj.push_back( json_spirit::Pair(p.first, p.second) );
         }
         
-        std::ostringstream buf;
-        write_json (buf, pt, false);
-        return buf.str();
+        top_obj.push_back( json_spirit::Pair("aps", aps_obj) );
+        
+        std::string str = json_spirit::write_string( json_spirit::Value(top_obj), false );
+        std::cout << "JSON: '" << str << "'\n";
+        
+        return str;
     }
     
     

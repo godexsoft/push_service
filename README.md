@@ -3,7 +3,12 @@ This library can be used to develop a push server with support for multiple serv
 
 Require 
 
+- Boost.System
 - Boost.Asio
+- Boost.Thread
+- Boost.Bind and Boost.Function
+- Boost.Foreach
+- JSON spirit (header-only, included)
 
 License
 
