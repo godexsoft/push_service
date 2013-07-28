@@ -91,10 +91,8 @@ namespace push {
             top_obj.push_back( json_spirit::Pair(p.first, p.second) );
         }
         
-        top_obj.push_back( json_spirit::Pair("aps", aps_obj) );
-        
+        top_obj.push_back( json_spirit::Pair("aps", aps_obj) );        
         std::string str = json_spirit::write_string( json_spirit::Value(top_obj), false );
-        std::cout << "JSON: '" << str << "'\n";
         
         return str;
     }
