@@ -117,6 +117,51 @@ namespace detail {
             throw push::exception::apns_exception("lost failed APNS message in cache");
         }
     }
+
+    void apns_connection::sort_cache_on_shutdown(const push::detail::apns_response& resp)
+    {
+        std::deque<apns_request>::iterator it =
+            std::find_if(cache_.begin(), cache_.end(),
+                boost::bind(&apns_request::get_identity, _1)
+                    == resp.get_identity() );
+        
+        // handle if found in the cache.
+        if(it != cache_.end())
+        {
+            // consider all before and including this one - success
+            if(callback_)
+            {
+                std::for_each(cache_.begin(), it,
+                    boost::bind(callback_, boost::system::error_code(),
+                        boost::bind(&apns_request::get_identity, _1)) );
+                
+                // and report the last successful too
+                callback_(boost::system::error_code(), it->get_identity());
+            }
+            
+            // and remove all successful
+            cache_.erase(cache_.begin(), it);
+            it = cache_.erase(it);
+            
+            // now for all the rest - enque them back into the pool
+            pool_.post(it, cache_.end());
+            
+            // and finally clear the cache
+            cache_.clear();
+        }
+        else
+        {
+            // it's not in the cache already and
+            // it probably means that the message was already
+            // processed successfully with callback invoked.
+            // however we still need to enque all messages currently in the cache.
+            it = cache_.begin();
+            pool_.post(it, cache_.end());
+            
+            // and clear the cache
+            cache_.clear();
+        }
+    }
     
     void apns_connection::handle_read_err(const boost::system::error_code& error)
     {
@@ -131,11 +176,13 @@ namespace detail {
 
             if(resp.to_error_code() == push::error::shutdown)
             {
-                // TODO: handle inside the connection. without notifying the user            
+                sort_cache_on_shutdown(resp);
             }
-            
-            // sort out the cache and error
-            sort_cache_on_error(resp);
+            else
+            {
+                // sort out the cache and error
+                sort_cache_on_error(resp);
+            }
         }
         else if (error != boost::asio::error::eof)
         {

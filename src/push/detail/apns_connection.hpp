@@ -44,6 +44,7 @@ namespace detail {
         
     private:
         void sort_cache_on_error(const push::detail::apns_response& resp);
+        void sort_cache_on_shutdown(const push::detail::apns_response& resp);
         void reset_cache_checker();
         void on_check_cache(const boost::system::error_code& err);
         
