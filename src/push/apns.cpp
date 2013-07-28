@@ -42,16 +42,21 @@ namespace push {
         if(!loc_key.empty())
         {
             // alert is json object
-            // and loc-args is an array
             json_spirit::Object alert_obj;
-            json_spirit::Array arr;
             
             alert_obj.push_back( json_spirit::Pair("loc-key", loc_key) );
             
-            std::for_each(loc_args.begin(), loc_args.end(),
-                boost::bind(&json_spirit::Array::push_back, boost::ref(arr), _1) );
+            if(!loc_args.empty())
+            {
+                // loc-args is array
+                json_spirit::Array arr;
+                
+                std::for_each(loc_args.begin(), loc_args.end(),
+                    boost::bind(&json_spirit::Array::push_back, boost::ref(arr), _1) );
+                
+                alert_obj.push_back( json_spirit::Pair("loc-args", arr) );
+            }
             
-            alert_obj.push_back( json_spirit::Pair("loc-args", arr) );
             aps_obj.push_back( json_spirit::Pair("alert", alert_obj) );
         }
         else if(!alert.empty())
