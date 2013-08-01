@@ -17,14 +17,21 @@
 #include <boost/asio/ssl.hpp>
 
 #include <json_spirit/json_spirit_writer_template.h>
+#include <boost/foreach.hpp>
 
 namespace push {
 
     using namespace boost::asio;
 
     gcm_message::gcm_message(const uint32_t& ident)
-    : ident_(ident)
+    : time_to_live(UINT64_MAX)
+    , ident_(ident)
     {        
+    }
+    
+    void gcm_message::add(const std::string& k, const std::string& v)
+    {
+        custom_.insert(std::make_pair(k,v));
     }
     
     void gcm_message::add_reg_id(const std::string& reg_id)
@@ -48,6 +55,56 @@ namespace push {
             boost::bind(&json_spirit::Array::push_back, boost::ref(reg_ids), _1) );
                 
         top_obj.push_back( json_spirit::Pair("registration_ids", reg_ids) );
+        
+        if(!notification_key.empty())
+        {
+            top_obj.push_back( json_spirit::Pair("notification_key", notification_key) );
+        }
+        
+        if(!notification_key_name.empty())
+        {
+            top_obj.push_back( json_spirit::Pair("notification_key_name", notification_key_name) );
+        }
+        
+        if(!collapse_key.empty())
+        {
+            top_obj.push_back( json_spirit::Pair("collapse_key", collapse_key) );
+        }
+        
+        if(time_to_live != UINT64_MAX)
+        {
+            top_obj.push_back( json_spirit::Pair("time_to_live", time_to_live) );
+        }
+        
+        // by default it's false in GCM
+        if(delay_while_idle)
+        {
+            top_obj.push_back( json_spirit::Pair("delay_while_idle", delay_while_idle) );
+        }
+        
+        if(!restricted_package_name.empty())
+        {
+            top_obj.push_back( json_spirit::Pair("restricted_package_name", restricted_package_name) );
+        }
+        
+        // by default it's false in GCM
+        if(dry_run)
+        {
+            top_obj.push_back( json_spirit::Pair("dry_run", dry_run) );
+        }
+        
+        if(!custom_.empty())
+        {
+            json_spirit::Object data_obj;
+            
+            // add custom key-values
+            BOOST_FOREACH(const custom_map_type::value_type& p, custom_)
+            {
+                data_obj.push_back( json_spirit::Pair(p.first, p.second) );
+            }
+            
+            top_obj.push_back( json_spirit::Pair("data", data_obj) );
+        }
         
         std::string str = json_spirit::write_string( json_spirit::Value(top_obj), false );
         
@@ -84,7 +141,6 @@ namespace push {
     uint32_t gcm::post(const device& dev, const std::string& payload,
                        const uint32_t expiry, const uint32_t& ident)
     {
-        // std::cout << "posting json job: '" << payload << "'\n";
         pool_.post( detail::gcm_request(dev, api_key_, payload, ident) );
         
         return ident;

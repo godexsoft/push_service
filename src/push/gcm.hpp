@@ -30,6 +30,15 @@ namespace push {
         gcm_message(const uint32_t& ident);
         
         // properties
+        std::string notification_key;
+        std::string notification_key_name;
+        std::string collapse_key;
+        uint64_t time_to_live;
+        bool delay_while_idle;
+        std::string restricted_package_name;
+        bool dry_run;
+        
+        void add(const std::string& k, const std::string& v);
         
         std::string to_json() const;
         
@@ -39,6 +48,9 @@ namespace push {
         
         const uint32_t ident_; // not really passed to GCM, used internally
         std::vector<std::string> registration_ids_;
+        
+        typedef std::map<std::string, std::string> custom_map_type;
+        std::map<std::string, std::string> custom_;
     };
     
     /**
