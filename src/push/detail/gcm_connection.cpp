@@ -261,8 +261,13 @@ namespace detail {
     {
         if (!error)
         {
-            // TODO: read them into some buffer
-            response_.consume(cur_chunk_size_ + 2);
+            // append the data off the streambuf into current_res_
+            std::istream response_stream(&response_);
+            std::vector<char> chunk(cur_chunk_size_, 0);
+            response_stream.read(&chunk.at(0), cur_chunk_size_);
+            
+            response_.consume(2); // +2 for \r\n
+            current_res_.append_json(chunk.begin(), chunk.end());
             
             // read the hex size of next chunk.
             async_read_until(*socket_, response_, "\r\n",
@@ -283,6 +288,7 @@ namespace detail {
         if (!error)
         {
             // TODO: do something useful with the callback and parsing of response
+            std::cout << "full json response: '" << current_res_.json_ << "'\n";
             
             //            if(callback_)
             //            {

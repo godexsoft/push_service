@@ -28,7 +28,14 @@ namespace detail {
         const push::error::gcm_err_code get_status() const;
         
     private:
+        template<typename Iter>
+        void append_json(const Iter& begin, const Iter& end)
+        {
+            json_.append(begin, end);
+        }
+        
         push::error::gcm_err_code  status_;
+        std::string json_;
     };
 
 } // namespace detail
