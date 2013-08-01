@@ -20,7 +20,7 @@ namespace error {
     {        
         switch(ev)
         {
-            case no_error:
+            case no_apns_error:
                 return "no error";
             case processing_error:
                 return "processing error";

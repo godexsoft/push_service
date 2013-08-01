@@ -14,7 +14,7 @@ namespace push {
 namespace detail {
 
     apns_response::apns_response(boost::asio::streambuf& data)
-    : status_(push::error::no_error)
+    : status_(push::error::no_apns_error)
     , identity_(0) // unset
     {
         boost::asio::streambuf::const_buffers_type bufs = data.data();

@@ -28,7 +28,7 @@ namespace detail {
         if (!error)
         {
             boost::system::error_code ec(
-                push::error::no_error, push::error::apns_error_category);
+                push::error::no_apns_error, push::error::apns_error_category);
                     
             for(uint32_t i=0; i<bytes_transferred%38; ++i)
             {

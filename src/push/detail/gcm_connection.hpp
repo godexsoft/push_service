@@ -16,6 +16,8 @@
 #include <deque>
 
 #include <push/detail/gcm_request.hpp>
+#include <push/detail/gcm_response.hpp>
+#include <push/detail/async_condition_variable.hpp>
 
 namespace push {
 namespace detail {
@@ -44,12 +46,17 @@ namespace detail {
         boost::asio::io_service& get_io_service();
         void stop();    
         
-        void wait_for_job();        
+        void wait_for_job();
+        void handle_job_available();
         bool verify_cert(bool accept_any, boost::asio::ssl::verify_context& ctx);
         void handle_connect(const boost::system::error_code& error);        
         void handle_handshake(const boost::system::error_code& error);
         void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
-        void handle_read(const boost::system::error_code& err);
+        void handle_read_statusline(const boost::system::error_code& error);
+        void handle_read_headers(const boost::system::error_code& error);
+        void handle_read_chunk_size(const boost::system::error_code& error);
+        void handle_read_body(const boost::system::error_code& err);
+        void handle_skip_footers(const boost::system::error_code& err);
         
         boost::asio::io_service         io_service_;
         boost::asio::io_service::work   work_;
@@ -65,8 +72,13 @@ namespace detail {
         
         gcm_request current_req_;
         boost::asio::streambuf response_;
+        gcm_response current_res_;
+        size_t cur_chunk_size_;
         
         callback_type callback_;
+        async_condition_variable::handle_type wait_handle_;
+        
+        bool new_request_;
     };
 
 } // namespace detail

@@ -25,6 +25,10 @@
 		242E703D1797190100C9AD10 /* gcm_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E703B1797190100C9AD10 /* gcm_connection.cpp */; };
 		242E703E1797190100C9AD10 /* gcm_connection.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E703C1797190100C9AD10 /* gcm_connection.hpp */; };
 		242E70401797811600C9AD10 /* async_condition_variable.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E703F1797811500C9AD10 /* async_condition_variable.hpp */; };
+		24C24B3D17A6D8850095E499 /* gcm_response.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24C24B3B17A6D8850095E499 /* gcm_response.cpp */; };
+		24C24B3E17A6D8850095E499 /* gcm_response.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24C24B3C17A6D8850095E499 /* gcm_response.hpp */; };
+		24C24B4117A6DA490095E499 /* gcm_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24C24B3F17A6DA480095E499 /* gcm_errors.cpp */; };
+		24C24B4217A6DA490095E499 /* gcm_errors.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24C24B4017A6DA480095E499 /* gcm_errors.hpp */; };
 		24D4E192178863B6007E9D6C /* push_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E190178863B6007E9D6C /* push_service.cpp */; };
 		24D4E19B178863DC007E9D6C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E19A178863DC007E9D6C /* main.cpp */; };
 		24D4E1A317886EE9007E9D6C /* libpush_service.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E18717886344007E9D6C /* libpush_service.a */; };
@@ -95,6 +99,10 @@
 		24C24B2717A5865D0095E499 /* json_spirit_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = json_spirit_writer.cpp; path = ext/json_spirit/json_spirit_writer.cpp; sourceTree = "<group>"; };
 		24C24B2817A5865D0095E499 /* json_spirit_writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_writer.h; path = ext/json_spirit/json_spirit_writer.h; sourceTree = "<group>"; };
 		24C24B2917A5865D0095E499 /* json_spirit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit.h; path = ext/json_spirit/json_spirit.h; sourceTree = "<group>"; };
+		24C24B3B17A6D8850095E499 /* gcm_response.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm_response.cpp; sourceTree = "<group>"; };
+		24C24B3C17A6D8850095E499 /* gcm_response.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_response.hpp; sourceTree = "<group>"; };
+		24C24B3F17A6DA480095E499 /* gcm_errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm_errors.cpp; sourceTree = "<group>"; };
+		24C24B4017A6DA480095E499 /* gcm_errors.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_errors.hpp; sourceTree = "<group>"; };
 		24D4E18717886344007E9D6C /* libpush_service.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpush_service.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E18F17886372007E9D6C /* push_service.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = push_service.hpp; sourceTree = "<group>"; };
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
@@ -171,6 +179,8 @@
 				242E703C1797190100C9AD10 /* gcm_connection.hpp */,
 				242E70351797182400C9AD10 /* gcm_request.cpp */,
 				242E70361797182500C9AD10 /* gcm_request.hpp */,
+				24C24B3B17A6D8850095E499 /* gcm_response.cpp */,
+				24C24B3C17A6D8850095E499 /* gcm_response.hpp */,
 			);
 			name = gcm;
 			sourceTree = "<group>";
@@ -261,6 +271,8 @@
 			children = (
 				242E702C178FFE6D00C9AD10 /* exception */,
 				24D4E1B4178AF685007E9D6C /* detail */,
+				24C24B3F17A6DA480095E499 /* gcm_errors.cpp */,
+				24C24B4017A6DA480095E499 /* gcm_errors.hpp */,
 				242E7028178F23C000C9AD10 /* apns_errors.cpp */,
 				242E7029178F23C000C9AD10 /* apns_errors.hpp */,
 				24D4E18F17886372007E9D6C /* push_service.hpp */,
@@ -308,6 +320,8 @@
 				242E70381797182500C9AD10 /* gcm_request.hpp in Headers */,
 				242E703E1797190100C9AD10 /* gcm_connection.hpp in Headers */,
 				242E70401797811600C9AD10 /* async_condition_variable.hpp in Headers */,
+				24C24B3E17A6D8850095E499 /* gcm_response.hpp in Headers */,
+				24C24B4217A6DA490095E499 /* gcm_errors.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,6 +406,8 @@
 				242E70331790105B00C9AD10 /* apns_feedback_connection.cpp in Sources */,
 				242E70371797182500C9AD10 /* gcm_request.cpp in Sources */,
 				242E703D1797190100C9AD10 /* gcm_connection.cpp in Sources */,
+				24C24B3D17A6D8850095E499 /* gcm_response.cpp in Sources */,
+				24C24B4117A6DA490095E499 /* gcm_errors.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

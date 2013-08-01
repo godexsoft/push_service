@@ -16,11 +16,45 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
+#include <json_spirit/json_spirit_writer_template.h>
+
 namespace push {
 
     using namespace boost::asio;
 
-    gcm::gcm(push_service& ps, const std::string& api_url,
+    gcm_message::gcm_message(const uint32_t& ident)
+    : ident_(ident)
+    {        
+    }
+    
+    void gcm_message::add_reg_id(const std::string& reg_id)
+    {
+        registration_ids_.push_back(reg_id);
+    }
+    
+    void gcm_message::clear_reg_ids()
+    {
+        registration_ids_.clear();
+    }
+
+    std::string gcm_message::to_json() const
+    {
+        json_spirit::Object top_obj;
+        
+        // registration_ids is array
+        json_spirit::Array reg_ids;
+                
+        std::for_each(registration_ids_.begin(), registration_ids_.end(),
+            boost::bind(&json_spirit::Array::push_back, boost::ref(reg_ids), _1) );
+                
+        top_obj.push_back( json_spirit::Pair("registration_ids", reg_ids) );
+        
+        std::string str = json_spirit::write_string( json_spirit::Value(top_obj), false );
+        
+        return str;
+    }
+    
+    gcm::gcm(push_service& ps,
              const std::string& project_id,
              const std::string& api_key,
              const callback_type& cb)
@@ -31,7 +65,7 @@ namespace push {
     , callback_(cb)
     {
         ip::tcp::resolver resolver(ps.get_io_service());
-        ip::tcp::resolver::query query(api_url, "https");
+        ip::tcp::resolver::query query("android.googleapis.com", "https");
         ip::tcp::resolver::iterator iterator = resolver.resolve(query);
         
         ssl_ctx_.set_options(ssl::context::default_workarounds
@@ -48,11 +82,21 @@ namespace push {
     }
 
     uint32_t gcm::post(const device& dev, const std::string& payload,
-                       const uint32_t expiry, const uint32_t ident)
+                       const uint32_t expiry, const uint32_t& ident)
     {
-        pool_.post( detail::gcm_request(dev, api_key_, payload) );
+        // std::cout << "posting json job: '" << payload << "'\n";
+        pool_.post( detail::gcm_request(dev, api_key_, payload, ident) );
         
         return ident;
+    }
+
+    uint32_t gcm::post(const device& dev, const gcm_message& msg,
+                       const uint32_t expiry)
+    {
+        gcm_message tmp(msg);
+        tmp.add_reg_id(dev.token);
+        
+        return post(dev, tmp.to_json(), expiry, msg.ident_);
     }
 
     

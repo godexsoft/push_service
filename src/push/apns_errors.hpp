@@ -16,7 +16,7 @@ namespace error {
 
     typedef enum apns_err_code_t
     {
-        no_error = 0,
+        no_apns_error = 0,
         processing_error = 1,
         missing_dev_token = 2,
         missing_topic = 3,

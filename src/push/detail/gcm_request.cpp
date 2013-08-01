@@ -16,10 +16,12 @@ namespace push {
 namespace detail {
 
     gcm_request::gcm_request()
+    : ident_(UINT32_MAX)
     {
     }
     
     gcm_request::gcm_request(const gcm_request& r)
+    : ident_(r.ident_)
     {
         *this = r;
     }
@@ -34,7 +36,8 @@ namespace detail {
             boost::asio::streambuf::const_buffers_type bufs = other.request_.data();
             std::string s(boost::asio::buffers_begin(bufs), boost::asio::buffers_begin(bufs) + other.request_.size());
             
-            request_stream << s;
+            request_stream << s;            
+            ident_ = other.ident_;
         }
         
         return *this;
@@ -42,17 +45,19 @@ namespace detail {
     
     gcm_request::gcm_request(const device& dev,
                              const std::string& api_key,
-                             const std::string& payload)
+                             const std::string& payload,
+                             const uint32_t& ident)
+    : ident_(ident)
     {
         std::ostream request_stream(&request_);
         
-        request_stream << "POST /gcm/send HTTP/1.0\r\n";
+        request_stream << "POST /gcm/send HTTP/1.1\r\n";
         request_stream << "User-Agent: push_service\r\n";
         request_stream << "Host: android.googleapis.com\r\n";
         request_stream << "Accept: */*\r\n";
         request_stream << "Content-Type: application/json\r\n";
         request_stream << "Authorization: key=" << api_key << "\r\n";
-        request_stream << "Connection: close\r\n";
+        request_stream << "Connection: Keep-Alive\r\n";
         request_stream << "Content-Length:" << payload.size() << "\r\n\r\n";
         request_stream << payload;
     }

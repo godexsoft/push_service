@@ -18,4 +18,6 @@ APNS
 GCM (WIP)
 
 - [DONE] Basic connection for GCM
+- [DONE] Chunked HTTP/1.1 support
 - [WIP] Basic HTTP GCM message wrapper
+- Parsing of GCM response and invocation of callback with error/success

@@ -18,6 +18,32 @@
 
 namespace push {
     
+    class gcm;
+    
+    /**
+     * @brief GCM message wrapper
+     */
+    class gcm_message : public push_message
+    {
+    public:
+        friend class gcm;
+        gcm_message(const uint32_t& ident);
+        
+        // properties
+        
+        std::string to_json() const;
+        
+    private:
+        void add_reg_id(const std::string& reg_id);
+        void clear_reg_ids();
+        
+        const uint32_t ident_; // not really passed to GCM, used internally
+        std::vector<std::string> registration_ids_;
+    };
+    
+    /**
+     * @brief GCM push provider
+     */
     class gcm : public provider
     {
     public:        
@@ -28,15 +54,19 @@ namespace push {
 
         static const char* key;
         
-        gcm(push_service& ps, const std::string& api_url,
-            const std::string& project_id, const std::string& api_key,
+        gcm(push_service& ps,
+            const std::string& project_id,
+            const std::string& api_key,
             const callback_type& cb = callback_type());
         
         bool validate_device(const device& dev) const;
 
         uint32_t post(const device& dev, const std::string& payload,
-                      const uint32_t expiry, const uint32_t ident);
-        
+                      const uint32_t expiry, const uint32_t& ident);
+
+        uint32_t post(const device& dev, const gcm_message& msg,
+                      const uint32_t expiry);
+
     private:
         const std::string api_key_;
         

@@ -33,10 +33,12 @@ namespace detail {
         
         gcm_request(const device& dev,
                     const std::string& api_key,
-                    const std::string& payload);
+                    const std::string& payload,
+                    const uint32_t& ident);
         
     private:
         boost::asio::streambuf request_;
+        uint32_t ident_;
     };
 
 } // namespace detail
