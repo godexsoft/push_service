@@ -72,6 +72,7 @@ namespace detail {
         
         gcm_request current_req_;
         boost::asio::streambuf response_;
+        std::string current_res_json_;
         gcm_response current_res_;
         size_t cur_chunk_size_;
         
