@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(push_service)
 
 # set some project-wide flags
-set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-overflow" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-overflow -DBOOST_SPIRIT_THREADSAFE" )
 
 # we require boost with some linked libraries
 find_package(Boost 1.53.0 COMPONENTS system)

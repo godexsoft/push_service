@@ -14,7 +14,7 @@
 
 namespace push {
 namespace detail {
-
+    
     gcm_request::gcm_request()
     : ident_(UINT32_MAX)
     {
@@ -61,6 +61,11 @@ namespace detail {
         request_stream << "Content-Length:" << payload.size() << "\r\n\r\n";
         request_stream << payload;
     }
-        
+    
+    const uint32_t gcm_request::get_identity() const
+    {
+        return ident_;
+    }
+    
 } // namespace detail
 } // namespace push

@@ -43,8 +43,8 @@ namespace error {
     class gcm_category : public boost::system::error_category
     {
     public:
-        const char *name() const;        
-        std::string message(int ev) const;
+        const char *name() const BOOST_SYSTEM_NOEXCEPT;
+        std::string message(int ev) const BOOST_SYSTEM_NOEXCEPT;
     };
     
     static const boost::system::error_category& gcm_error_category
@@ -60,8 +60,8 @@ namespace error {
     class gcm_entry_category : public boost::system::error_category
     {
     public:
-        const char *name() const;
-        std::string message(int ev) const;
+        const char *name() const BOOST_SYSTEM_NOEXCEPT;
+        std::string message(int ev) const BOOST_SYSTEM_NOEXCEPT;
     };
     
     static const boost::system::error_category& gcm_entry_error_category

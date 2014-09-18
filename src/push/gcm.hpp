@@ -42,9 +42,10 @@ namespace push {
         
         std::string to_json() const;
         
-    private:
         void add_reg_id(const std::string& reg_id);
         void clear_reg_ids();
+        
+    private:
         
         const uint32_t ident_; // not really passed to GCM, used internally
         std::vector<std::string> registration_ids_;
@@ -69,6 +70,7 @@ namespace push {
         gcm(push_service& ps,
             const std::string& project_id,
             const std::string& api_key,
+            const uint32_t& poolsize = 1,
             const callback_type& cb = callback_type());
         
         bool validate_device(const device& dev) const;

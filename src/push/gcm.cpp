@@ -25,8 +25,10 @@ namespace push {
 
     gcm_message::gcm_message(const uint32_t& ident)
     : time_to_live(UINT64_MAX)
+    , delay_while_idle(false)
+    , dry_run(false)
     , ident_(ident)
-    {        
+    {
     }
     
     void gcm_message::add(const std::string& k, const std::string& v)
@@ -50,9 +52,11 @@ namespace push {
         
         // registration_ids is array
         json_spirit::Array reg_ids;
-                
-        std::for_each(registration_ids_.begin(), registration_ids_.end(),
-            boost::bind(&json_spirit::Array::push_back, boost::ref(reg_ids), _1) );
+        
+        for(auto it = registration_ids_.begin(); it != registration_ids_.end(); ++it)
+        {
+            reg_ids.push_back(*it);
+        }
                 
         top_obj.push_back( json_spirit::Pair("registration_ids", reg_ids) );
         
@@ -114,10 +118,11 @@ namespace push {
     gcm::gcm(push_service& ps,
              const std::string& project_id,
              const std::string& api_key,
+             const uint32_t& poolsize,
              const callback_type& cb)
     : provider(ps, gcm::key)
     , api_key_(api_key)
-    , pool_(ps.get_io_service(), 4) // TODO: hardcoded for now. remove
+    , pool_(ps.get_io_service(), poolsize)
     , ssl_ctx_(ssl::context::sslv23)
     , callback_(cb)
     {

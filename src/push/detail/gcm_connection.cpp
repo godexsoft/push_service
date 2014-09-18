@@ -64,6 +64,7 @@ namespace detail {
     
     gcm_connection::gcm_connection(pool_type& pool)
     : work_(io_service_)
+    , strand_(io_service_)
     , pool_(pool)
     , new_request_(true)
     {
@@ -76,7 +77,7 @@ namespace detail {
         // and the async_condition_variable waiter will be disconnected.
         wait_handle_ =
             pool_.async_wait_for_job(
-                boost::bind(&gcm_connection::handle_job_available, this));
+                strand_.wrap(boost::bind(&gcm_connection::handle_job_available, this) ) );
     }
     
     void gcm_connection::handle_job_available()
@@ -94,12 +95,13 @@ namespace detail {
         else
         {
             current_req_ = *job;
+            current_res_json_.resize(0);
 
             async_write(*socket_,
                 buffer(current_req_.request_.data()),
-                    boost::bind(&gcm_connection::handle_write, this,
+                    strand_.wrap(boost::bind(&gcm_connection::handle_write, this,
                         placeholders::error,
-                        placeholders::bytes_transferred));
+                        placeholders::bytes_transferred) ) );
         }
     }
     
@@ -115,15 +117,15 @@ namespace detail {
         {
             // read status line
             async_read_until(*socket_, response_, "\r\n",
-                boost::bind(&gcm_connection::handle_read_statusline, this,
-                    placeholders::error));
+                strand_.wrap( boost::bind(&gcm_connection::handle_read_statusline, this,
+                    placeholders::error) ) );
         }
         else
         {
-            // read the hex size of first chunk
-            async_read_until(*socket_, response_, "\r\n",
-                boost::bind(&gcm_connection::handle_read_chunk_size, this,
-                    placeholders::error));
+            // read the headers
+            async_read_until(*socket_, response_, "\r\n\r\n",
+                strand_.wrap(boost::bind(&gcm_connection::handle_read_headers, this,
+                    placeholders::error) ) );
         }
     }
     
@@ -152,7 +154,7 @@ namespace detail {
                 }
                 
                 // copmpletely restart connection
-                start(ssl_ctx_, resolved_iterator_, callback_);
+                restart();
                 
                 return;
             }
@@ -168,15 +170,15 @@ namespace detail {
                 }
                 
                 // copmpletely restart connection
-                start(ssl_ctx_, resolved_iterator_, callback_);
+                restart();
                 
                 return;
             }
          
             // read the headers
             async_read_until(*socket_, response_, "\r\n\r\n",
-                boost::bind(&gcm_connection::handle_read_headers, this,
-                    placeholders::error));
+                strand_.wrap(boost::bind(&gcm_connection::handle_read_headers, this,
+                    placeholders::error) ) );
         }
         else
         {
@@ -199,8 +201,8 @@ namespace detail {
             
             // read the hex size of first chunk
             async_read_until(*socket_, response_, "\r\n",
-                boost::bind(&gcm_connection::handle_read_chunk_size, this,
-                    placeholders::error));
+                strand_.wrap(boost::bind(&gcm_connection::handle_read_chunk_size, this,
+                    placeholders::error) ) );
         }
         else
         {
@@ -232,26 +234,23 @@ namespace detail {
             
             if(cur_chunk_size_ == 0)
             {
-                // end of chunked response. footers are not sent by google.
+                // end of chunked response. check footers.
                 async_read_until(*socket_, response_, "\r\n",
-                    boost::bind(&gcm_connection::handle_skip_footers, this,
-                        placeholders::error));
+                    strand_.wrap(boost::bind(&gcm_connection::handle_skip_footers, this,
+                        placeholders::error) ) );
             }
             else
             {
                 // read the chunk body.
                 async_read_until(*socket_, response_,
-                    match_exact_size(cur_chunk_size_ + 2), // +2 because of \r\n
-                    boost::bind(&gcm_connection::handle_read_body, this,
-                        placeholders::error));
+                    match_exact_size(cur_chunk_size_), // don't add 2 for \r\n
+                    strand_.wrap(boost::bind(&gcm_connection::handle_read_body, this,
+                        placeholders::error) ) );
             }
         }
         else
         {
             throw std::runtime_error("read error: " + error.message());
-            
-            // TODO: perhaps restart connection here instead of throwing:
-            // start(ssl_ctx_, resolved_iterator_, callback_);
         }
     }
     
@@ -269,15 +268,12 @@ namespace detail {
             
             // read the hex size of next chunk.
             async_read_until(*socket_, response_, "\r\n",
-                boost::bind(&gcm_connection::handle_read_chunk_size, this,
-                    placeholders::error));
+                strand_.wrap(boost::bind(&gcm_connection::handle_read_chunk_size, this,
+                    placeholders::error) ) );
         }
         else
         {
             throw std::runtime_error("read error: " + error.message());
-            
-            // TODO: perhaps restart connection here instead of throwing:
-            // start(ssl_ctx_, resolved_iterator_, callback_);
         }
     }
 
@@ -285,15 +281,22 @@ namespace detail {
     {
         if (!error)
         {
-            // TODO: do something useful with the callback and parsing of response
-            std::cout << "full json response: '" << current_res_json_ << "'\n";
-
+            // check if there are any footers
+            std::istream response_stream(&response_);
+            std::string footer;
+            
+            while (std::getline(response_stream, footer) && footer != "\r")
+            {
+                std::cout << "Footer: " << footer << "\n";
+            }
+            
+            // std::cout << "full json response: '" << current_res_json_ << "'\n";
             current_res_ = push::detail::gcm_response(current_res_json_);
             
-            //            if(callback_)
-            //            {
-            //                callback_(boost::system::error_code(), current_req_.ident_);
-            //            }
+            if(callback_)
+            {
+                callback_(current_res_.to_error_code(), current_req_.ident_);
+            }
 
             // reuse open connection
             wait_for_job();
@@ -301,9 +304,6 @@ namespace detail {
         else
         {
             throw std::runtime_error("read error: " + error.message());
-            
-            // TODO: perhaps restart connection here instead of throwing:
-            // start(ssl_ctx_, resolved_iterator_, callback_);
         }
     }
 
@@ -322,8 +322,13 @@ namespace detail {
         socket_->set_verify_callback(boost::bind(&gcm_connection::verify_cert, this, _1, _2));
         
         async_connect(socket_->lowest_layer(), iterator,
-            boost::bind(&gcm_connection::handle_connect, this,
-                placeholders::error));
+            strand_.wrap(boost::bind(&gcm_connection::handle_connect, this,
+                placeholders::error) ) );
+    }
+    
+    void gcm_connection::restart()
+    {
+        start(ssl_ctx_, resolved_iterator_, callback_);
     }
     
     bool gcm_connection::verify_cert(bool accept_any,
@@ -338,8 +343,8 @@ namespace detail {
         if (!error)
         {
             socket_->async_handshake(ssl::stream_base::client,
-                boost::bind(&gcm_connection::handle_handshake, this,
-                    placeholders::error));
+                strand_.wrap(boost::bind(&gcm_connection::handle_handshake, this,
+                    placeholders::error) ) );
         }
         else
         {

@@ -11,6 +11,7 @@
 
 #include <push/detail/apns_connection.hpp>
 #include <push/detail/apns_request.hpp>
+#include <push/detail/p12.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -51,8 +52,10 @@ namespace push {
                 // loc-args is array
                 json_spirit::Array arr;
                 
-                std::for_each(loc_args.begin(), loc_args.end(),
-                    boost::bind(&json_spirit::Array::push_back, boost::ref(arr), _1) );
+                for(auto it = loc_args.begin(); it != loc_args.end(); ++it)
+                {
+                    arr.push_back(*it);
+                }
                 
                 alert_obj.push_back( json_spirit::Pair("loc-args", arr) );
             }
@@ -112,10 +115,30 @@ namespace push {
                              | ssl::context::no_sslv2
                              | ssl::context::single_dh_use);
         
-        ssl_ctx_.use_private_key_file(cfg.private_key, ssl::context::pem);
-        ssl_ctx_.use_certificate_file(cfg.certificate, ssl::context::pem);
+        if(cfg.p12_cert_key.empty())
+        {
+            if(!cfg.p12_pass.empty())
+            {
+                ssl_ctx_.set_password_callback(boost::bind(&apns::give_p12_pass, this, cfg.p12_pass));
+            }
+            
+            ssl_ctx_.use_private_key_file(cfg.private_key, ssl::context::pem);
+            ssl_ctx_.use_certificate_file(cfg.certificate, ssl::context::pem);
+        }
+        else
+        {
+            cert_key_ = detail::p12::extract_cert_key_pem(cfg.p12_cert_key, cfg.p12_pass);
+            
+            ssl_ctx_.use_private_key(boost::asio::buffer(cert_key_.second.c_str(), cert_key_.second.size()), ssl::context::pem);
+            ssl_ctx_.use_certificate(boost::asio::buffer(cert_key_.first.c_str(), cert_key_.first.size()), ssl::context::pem);
+        }
         
         pool_.start(ssl_ctx_, iterator, callback_);
+    }
+    
+    const std::string apns::give_p12_pass(const std::string& pass)
+    {
+        return pass;
     }
     
     bool apns::validate_device(const device& dev) const
@@ -150,8 +173,28 @@ namespace push {
                              | ssl::context::no_sslv2
                              | ssl::context::single_dh_use);
         
-        ssl_ctx_.use_private_key_file(cfg.private_key, ssl::context::pem);
-        ssl_ctx_.use_certificate_file(cfg.certificate, ssl::context::pem);
+        if(cfg.p12_cert_key.empty())
+        {
+            if(!cfg.p12_pass.empty())
+            {
+                ssl_ctx_.set_password_callback(boost::bind(&apns_feedback::give_p12_pass, this, cfg.p12_pass));
+            }
+
+            ssl_ctx_.use_private_key_file(cfg.private_key, ssl::context::pem);
+            ssl_ctx_.use_certificate_file(cfg.certificate, ssl::context::pem);
+        }
+        else
+        {
+            cert_key_ = detail::p12::extract_cert_key_pem(cfg.p12_cert_key, cfg.p12_pass);
+            
+            ssl_ctx_.use_private_key(boost::asio::buffer(cert_key_.second.c_str(), cert_key_.second.size()), ssl::context::pem);
+            ssl_ctx_.use_certificate(boost::asio::buffer(cert_key_.first.c_str(), cert_key_.first.size()), ssl::context::pem);
+        }
+    }
+    
+    const std::string apns_feedback::give_p12_pass(const std::string& pass)
+    {
+        return pass;
     }
     
     void apns_feedback::start()

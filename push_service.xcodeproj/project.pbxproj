@@ -25,6 +25,8 @@
 		242E703D1797190100C9AD10 /* gcm_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 242E703B1797190100C9AD10 /* gcm_connection.cpp */; };
 		242E703E1797190100C9AD10 /* gcm_connection.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E703C1797190100C9AD10 /* gcm_connection.hpp */; };
 		242E70401797811600C9AD10 /* async_condition_variable.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 242E703F1797811500C9AD10 /* async_condition_variable.hpp */; };
+		2484219419AC034A00FE1330 /* p12.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 2484219319AC034A00FE1330 /* p12.hpp */; };
+		24A4238219A0FB3000EFFB22 /* boost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24A4238119A0FB2F00EFFB22 /* boost.framework */; };
 		24C24B3D17A6D8850095E499 /* gcm_response.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24C24B3B17A6D8850095E499 /* gcm_response.cpp */; };
 		24C24B3E17A6D8850095E499 /* gcm_response.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24C24B3C17A6D8850095E499 /* gcm_response.hpp */; };
 		24C24B4117A6DA490095E499 /* gcm_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24C24B3F17A6DA480095E499 /* gcm_errors.cpp */; };
@@ -32,7 +34,6 @@
 		24D4E192178863B6007E9D6C /* push_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E190178863B6007E9D6C /* push_service.cpp */; };
 		24D4E19B178863DC007E9D6C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E19A178863DC007E9D6C /* main.cpp */; };
 		24D4E1A317886EE9007E9D6C /* libpush_service.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E18717886344007E9D6C /* libpush_service.a */; };
-		24D4E1A617887207007E9D6C /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E1A4178871D2007E9D6C /* libboost_system.a */; };
 		24D4E1A917887320007E9D6C /* push_provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E1A717887320007E9D6C /* push_provider.cpp */; };
 		24D4E1AA17887320007E9D6C /* push_provider.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24D4E1A817887320007E9D6C /* push_provider.hpp */; };
 		24D4E1AE178874CC007E9D6C /* apns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E1AC178874CC007E9D6C /* apns.cpp */; };
@@ -41,7 +42,6 @@
 		24D4E1B3178A4684007E9D6C /* gcm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24D4E1B1178A4684007E9D6C /* gcm.hpp */; };
 		24D4E1B7178AF6A7007E9D6C /* apns_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 24D4E1B5178AF6A7007E9D6C /* apns_connection.cpp */; };
 		24D4E1B8178AF6A7007E9D6C /* apns_connection.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 24D4E1B6178AF6A7007E9D6C /* apns_connection.hpp */; };
-		24D4E1BA178B1F3D007E9D6C /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D4E1B9178B1F3D007E9D6C /* libboost_thread.a */; };
 		F44B2E1B3F6ACED61D7407BF /* connection_pool.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F44B202B92528F8F9F233C67 /* connection_pool.hpp */; };
 /* End PBXBuildFile section */
 
@@ -86,6 +86,8 @@
 		242E703B1797190100C9AD10 /* gcm_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm_connection.cpp; sourceTree = "<group>"; };
 		242E703C1797190100C9AD10 /* gcm_connection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm_connection.hpp; sourceTree = "<group>"; };
 		242E703F1797811500C9AD10 /* async_condition_variable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = async_condition_variable.hpp; sourceTree = "<group>"; };
+		2484219319AC034A00FE1330 /* p12.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = p12.hpp; sourceTree = "<group>"; };
+		24A4238119A0FB2F00EFFB22 /* boost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = boost.framework; path = System/Library/Frameworks/boost.framework; sourceTree = SDKROOT; };
 		24C24B13179DB5DA0095E499 /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util.hpp; sourceTree = "<group>"; };
 		24C24B1E17A5865D0095E499 /* json_spirit_error_position.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_error_position.h; path = ext/json_spirit/json_spirit_error_position.h; sourceTree = "<group>"; };
 		24C24B1F17A5865D0095E499 /* json_spirit_reader_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = json_spirit_reader_template.h; path = ext/json_spirit/json_spirit_reader_template.h; sourceTree = "<group>"; };
@@ -108,7 +110,6 @@
 		24D4E190178863B6007E9D6C /* push_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_service.cpp; sourceTree = "<group>"; };
 		24D4E198178863DC007E9D6C /* test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test; sourceTree = BUILT_PRODUCTS_DIR; };
 		24D4E19A178863DC007E9D6C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		24D4E1A4178871D2007E9D6C /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = /usr/local/lib/libboost_system.a; sourceTree = "<absolute>"; };
 		24D4E1A717887320007E9D6C /* push_provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = push_provider.cpp; sourceTree = "<group>"; };
 		24D4E1A817887320007E9D6C /* push_provider.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = push_provider.hpp; sourceTree = "<group>"; };
 		24D4E1AC178874CC007E9D6C /* apns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns.cpp; sourceTree = "<group>"; };
@@ -117,7 +118,6 @@
 		24D4E1B1178A4684007E9D6C /* gcm.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = gcm.hpp; sourceTree = "<group>"; };
 		24D4E1B5178AF6A7007E9D6C /* apns_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = apns_connection.cpp; sourceTree = "<group>"; };
 		24D4E1B6178AF6A7007E9D6C /* apns_connection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = apns_connection.hpp; sourceTree = "<group>"; };
-		24D4E1B9178B1F3D007E9D6C /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = /usr/local/lib/libboost_thread.a; sourceTree = "<absolute>"; };
 		F44B202B92528F8F9F233C67 /* connection_pool.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = connection_pool.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,6 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24A4238219A0FB3000EFFB22 /* boost.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,8 +136,6 @@
 			files = (
 				242E701A178C2C8D00C9AD10 /* libcrypto.dylib in Frameworks */,
 				242E7018178C2C8700C9AD10 /* libssl.dylib in Frameworks */,
-				24D4E1BA178B1F3D007E9D6C /* libboost_thread.a in Frameworks */,
-				24D4E1A617887207007E9D6C /* libboost_system.a in Frameworks */,
 				24D4E1A317886EE9007E9D6C /* libpush_service.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -149,8 +148,6 @@
 			children = (
 				242E7019178C2C8D00C9AD10 /* libcrypto.dylib */,
 				242E7017178C2C8700C9AD10 /* libssl.dylib */,
-				24D4E1B9178B1F3D007E9D6C /* libboost_thread.a */,
-				24D4E1A4178871D2007E9D6C /* libboost_system.a */,
 			);
 			name = linker;
 			sourceTree = "<group>";
@@ -230,6 +227,7 @@
 		24D4E17E17886344007E9D6C = {
 			isa = PBXGroup;
 			children = (
+				24A4238119A0FB2F00EFFB22 /* boost.framework */,
 				24C24B1417A585F20095E499 /* ext */,
 				242E7022178C74BB00C9AD10 /* linker */,
 				24D4E18E17886358007E9D6C /* src */,
@@ -294,6 +292,7 @@
 				242E703A1797183600C9AD10 /* apns */,
 				F44B202B92528F8F9F233C67 /* connection_pool.hpp */,
 				242E703F1797811500C9AD10 /* async_condition_variable.hpp */,
+				2484219319AC034A00FE1330 /* p12.hpp */,
 			);
 			path = detail;
 			sourceTree = "<group>";
@@ -305,6 +304,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2484219419AC034A00FE1330 /* p12.hpp in Headers */,
 				24D4E1AA17887320007E9D6C /* push_provider.hpp in Headers */,
 				24D4E1AF178874CC007E9D6C /* apns.hpp in Headers */,
 				24D4E1B3178A4684007E9D6C /* gcm.hpp in Headers */,
@@ -434,9 +434,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
-				CLANG_CXX_LIBRARY = "compiler-default";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -448,8 +448,10 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"BOOST_SPIRIT_THREADSAFE=1",
 					"DEBUG=1",
-					"$(inherited)",
+					"BOOST_SPIRIT_USE_PHOENIX_V3=1",
+					"BOOST_HAS_THREADS=1",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = "";
@@ -473,9 +475,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
-				CLANG_CXX_LIBRARY = "compiler-default";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
@@ -485,6 +487,11 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"BOOST_SPIRIT_THREADSAFE=1",
+					"BOOST_SPIRIT_USE_PHOENIX_V3=1",
+					"BOOST_HAS_THREADS=1",
+				);
 				GCC_VERSION = "";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

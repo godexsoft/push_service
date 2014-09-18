@@ -9,10 +9,11 @@
 #include <push/detail/apns_request.hpp>
 #include <push/push_provider.hpp>
 #include <algorithm>
+#include <boost/thread.hpp>
 
 namespace push {
 namespace detail {
-
+    
     apns_request::apns_request()
     : len_(0)
     {
@@ -23,7 +24,7 @@ namespace detail {
     , time_(boost::posix_time::microsec_clock::local_time()) // set to now
     , body_(r.body_)
     , len_(r.len_)
-    {        
+    {
     }
     
     apns_request::apns_request(const device& dev, const std::string& payload,

@@ -68,8 +68,10 @@ namespace push {
         {
             std::string     host;
             std::string     port;
-            std::string     certificate;
-            std::string     private_key;
+            std::string     certificate; // pem
+            std::string     private_key; // pem
+            std::string     p12_cert_key; // .p12 with both cert and key
+            std::string     p12_pass; // .p12 password for the above
             uint16_t        pool_size;
             callback_type   callback;
             
@@ -79,6 +81,15 @@ namespace push {
             , port(p)
             , certificate(crt)
             , private_key(pk)
+            , pool_size(4)
+            {
+            }
+            
+            config(const std::string& h, const std::string& p,
+                   const std::string& p12_ck)
+            : host(h)
+            , port(p)
+            , p12_cert_key(p12_ck)
             , pool_size(4)
             {
             }
@@ -104,6 +115,24 @@ namespace push {
                     pk
                 );
             }
+            
+            static config sandbox(const std::string& p12_ck)
+            {
+                return config(
+                    "gateway.sandbox.push.apple.com",
+                    "2195",
+                    p12_ck
+                );
+            }
+            
+            static config production(const std::string& p12_ck)
+            {
+                return config(
+                    "gateway.push.apple.com",
+                    "2195",
+                    p12_ck
+                );
+            }
         };        
         
         static const char* key;
@@ -119,6 +148,9 @@ namespace push {
                       const uint32_t expiry, const uint32_t ident);
 
     private:
+        const std::string give_p12_pass(const std::string& pass);
+        std::pair<std::string, std::string> cert_key_;
+        
         push::detail::connection_pool<
             push::detail::apns_connection,
             push::detail::apns_request> pool_;
@@ -145,8 +177,10 @@ namespace push {
         {
             std::string     host;
             std::string     port;
-            std::string     certificate;
-            std::string     private_key;
+            std::string     certificate; // pem
+            std::string     private_key; // pem
+            std::string     p12_cert_key; // .p12 with both cert and key
+            std::string     p12_pass; // .p12 password for the above
             callback_type   callback;
             
             config(const std::string& h, const std::string& p,
@@ -155,6 +189,14 @@ namespace push {
             , port(p)
             , certificate(crt)
             , private_key(pk)
+            {
+            }
+
+            config(const std::string& h, const std::string& p,
+                   const std::string& p12_ck)
+            : host(h)
+            , port(p)
+            , p12_cert_key(p12_ck)
             {
             }
             
@@ -179,6 +221,25 @@ namespace push {
                     pk
                 );
             }
+            
+            static config sandbox(const std::string& p12_ck)
+            {
+                return config(
+                    "feedback.sandbox.push.apple.com",
+                    "2196",
+                    p12_ck
+                );
+            }
+            
+            static config production(const std::string& p12_ck)
+            {
+                return config(
+                    "feedback.push.apple.com",
+                    "2196",
+                    p12_ck
+                );
+            }
+
         };
         
         apns_feedback(push_service& ps, const config& cfg);
@@ -190,9 +251,12 @@ namespace push {
         void stop();
         
     private:
+        const std::string give_p12_pass(const std::string& pass);
+        
         push_service&  push_service_;
         const std::string host_;
         const std::string port_;
+        std::pair<std::string, std::string> cert_key_;
         callback_type  on_feedback_;
         
         boost::asio::ssl::context ssl_ctx_;

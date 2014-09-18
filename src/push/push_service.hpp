@@ -22,7 +22,8 @@ namespace push {
     public:
         friend class provider;
         explicit push_service(boost::asio::io_service& io);
-//        
+
+//
 //        template<typename Dev>
 //        uint32_t post(const Dev& dev, const std::string& raw_payload,
 //                      const uint32_t expiration = 0, const uint32_t ident = 123456)

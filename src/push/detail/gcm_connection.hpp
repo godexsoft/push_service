@@ -41,6 +41,7 @@ namespace detail {
         void start(boost::asio::ssl::context* const context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
                    const callback_type& cb);
+        void restart();
         
     private:
         boost::asio::io_service& get_io_service();
@@ -60,6 +61,7 @@ namespace detail {
         
         boost::asio::io_service         io_service_;
         boost::asio::io_service::work   work_;
+        boost::asio::strand             strand_;
 
         boost::shared_ptr<ssl_socket_t> socket_;
         pool_type& pool_;

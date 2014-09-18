@@ -41,6 +41,7 @@ namespace detail {
         void start(boost::asio::ssl::context* const context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
                    const callback_type& cb);
+        void restart();
         
     private:
         void sort_cache_on_error(const push::detail::apns_response& resp);
@@ -61,6 +62,7 @@ namespace detail {
         
         boost::asio::io_service         io_service_;
         boost::asio::io_service::work   work_;
+        boost::asio::strand             strand_;
         boost::asio::deadline_timer     cache_check_timer_;
 
         boost::shared_ptr<ssl_socket_t> socket_;

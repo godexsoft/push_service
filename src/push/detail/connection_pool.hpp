@@ -46,12 +46,7 @@ namespace detail {
             
             for(uint32_t i = 0; i<cnt; ++i)
             {
-                boost::shared_ptr<T> con = boost::shared_ptr<T> ( new T(*this) );
-                
-                threads_.create_thread(
-                    boost::bind(&boost::asio::io_service::run, boost::ref(con->get_io_service())) );
-
-                connections_.push_back(con);
+                spawn_connection();
             }
         }
         
@@ -69,7 +64,8 @@ namespace detail {
                    const callback_type& cb)
         {
             std::for_each(connections_.begin(), connections_.end(),
-                boost::bind(&T::start, _1, &context, iterator, callback_io_.wrap(cb) ) );
+                callback_io_.wrap(
+                    boost::bind(&T::start, _1, &context, iterator, callback_io_.wrap(cb) ) ) );
         }
         
         void post(const J& job)
@@ -116,6 +112,31 @@ namespace detail {
         }
         
     private:
+        
+        void run_one(boost::shared_ptr<T>& con)
+        {
+            try
+            {
+                con->get_io_service().run();
+            }
+            catch(std::exception& e)
+            {
+                // just restart the connection
+                // con->restart();
+                // TODO: figure out how to restart the connection properly
+                throw;
+            }
+        }
+        
+        void spawn_connection()
+        {
+            boost::shared_ptr<T> con = boost::shared_ptr<T> ( new T(*this) );
+            connections_.push_back(con);
+            
+            threads_.create_thread(
+                boost::bind(&connection_pool::run_one, this, con) );
+        }
+        
         /// io_service which we will use for the callbacks
         boost::asio::io_service&    callback_io_;
 

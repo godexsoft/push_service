@@ -17,6 +17,7 @@ namespace detail {
     
     apns_connection::apns_connection(pool_type& pool)
     : work_(io_service_)
+    , strand_(io_service_)
     , cache_check_timer_(io_service_)
     , pool_(pool)
     {
@@ -29,7 +30,7 @@ namespace detail {
         // and the async_condition_variable waiter will be disconnected.
         wait_handle_ =
             pool_.async_wait_for_job(
-                boost::bind(&apns_connection::handle_job_available, this));
+                strand_.wrap(boost::bind(&apns_connection::handle_job_available, this) ) );
     }
 
     void apns_connection::handle_job_available()
@@ -48,13 +49,14 @@ namespace detail {
         {
             // got new job. add it to cache.. request time resets automatically.
             current_req_ = *job;
+            
             cache_.push_back(current_req_);
             
             async_write(*socket_,
                 buffer(current_req_.body_, current_req_.len_),
-                boost::bind(&apns_connection::handle_write, this,
+                strand_.wrap( boost::bind(&apns_connection::handle_write, this,
                     placeholders::error,
-                    placeholders::bytes_transferred));
+                    placeholders::bytes_transferred) ) );
         }
     }
     
@@ -89,7 +91,7 @@ namespace detail {
             }
             
             // and now remove them
-            cache_.erase(cache_.begin(), it);
+            it = cache_.erase(cache_.begin(), it);
             
             // report error
             if(callback_)
@@ -186,11 +188,16 @@ namespace detail {
         }
         else if (error != boost::asio::error::eof)
         {
+            if(callback_)
+            {
+                callback_(error, current_req_.get_identity());
+            }
+
             throw push::exception::apns_exception("read error: " + error.message());
         }
                 
         // reconnect because Apple closes the socket on error
-        start(ssl_ctx_, resolved_iterator_, callback_);
+        restart();
     }
     
     void apns_connection::start(ssl::context* const context,
@@ -207,8 +214,13 @@ namespace detail {
         socket_->set_verify_callback(boost::bind(&apns_connection::verify_cert, this, _1, _2));
         
         async_connect(socket_->lowest_layer(), iterator,
-            boost::bind(&apns_connection::handle_connect, this,
-                placeholders::error));
+            strand_.wrap( boost::bind(&apns_connection::handle_connect, this,
+                placeholders::error) ) );
+    }
+    
+    void apns_connection::restart()
+    {
+        start(ssl_ctx_, resolved_iterator_, callback_);
     }
     
     bool apns_connection::verify_cert(bool accept_any,
@@ -223,11 +235,16 @@ namespace detail {
         if (!error)
         {
             socket_->async_handshake(ssl::stream_base::client,
-                boost::bind(&apns_connection::handle_handshake, this,
-                    placeholders::error));
+                strand_.wrap( boost::bind(&apns_connection::handle_handshake, this,
+                    placeholders::error) ) );
         }
         else
         {
+            if(callback_)
+            {
+                callback_(error, current_req_.get_identity());
+            }
+
             throw push::exception::apns_exception("apns connection failed: " + error.message());
         }
     }
@@ -236,6 +253,11 @@ namespace detail {
     {
         if (error)
         {
+            if(callback_)
+            {
+                callback_(error, current_req_.get_identity());
+            }
+
             throw push::exception::apns_exception("apns handshake failed: " + error.message());
         }
         
@@ -244,8 +266,8 @@ namespace detail {
         // to push messages over this pipe.
         async_read(*socket_, response_,
             transfer_exactly(6), // exactly six bytes must be set for a valid reply
-            boost::bind(&apns_connection::handle_read_err, this,
-                placeholders::error));
+                strand_.wrap( boost::bind(&apns_connection::handle_read_err, this,
+                    placeholders::error) ) );
         
         // finally, allow clients to (re)use this connection.
         reset_cache_checker();
@@ -261,8 +283,8 @@ namespace detail {
     {
         cache_check_timer_.expires_from_now(boost::posix_time::seconds(1));
         cache_check_timer_.async_wait(
-            boost::bind(&apns_connection::on_check_cache,
-                this, boost::asio::placeholders::error));
+            strand_.wrap( boost::bind(&apns_connection::on_check_cache,
+                this, boost::asio::placeholders::error) ) );
     }
     
     void apns_connection::on_check_cache(const boost::system::error_code& err)

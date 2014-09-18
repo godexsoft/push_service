@@ -116,10 +116,11 @@ namespace detail {
     , failure(0)
     , canonical_ids(0)
     , status_(push::error::no_gcm_error)
-    {
+    {   
         Value val;
         if(!read_string(json, val))
         {
+            std::cout << "FAILED ON JSON: " << json << "\n";
             status_ = push::error::json_parsing_error;
             return;
         }
