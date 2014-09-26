@@ -26,7 +26,7 @@ else()
 endif()
 
 # we require boost with some linked libraries
-find_package(Boost 1.53.0 COMPONENTS system)
+find_package(Boost 1.54.0 REQUIRED COMPONENTS system)
 
 set( LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib/pc CACHE PATH
         "Single Directory for all Libraries")
