@@ -11,12 +11,12 @@
 namespace push {
 namespace error {
     
-    const char * gcm_entry_category::name() const
+    const char * gcm_entry_category::name() const BOOST_SYSTEM_NOEXCEPT
     {
         return "gcm result entry";
     }
     
-    std::string gcm_entry_category::message(int ev) const
+    std::string gcm_entry_category::message(int ev) const BOOST_SYSTEM_NOEXCEPT
     {        
         switch(ev)
         {
@@ -48,12 +48,12 @@ namespace error {
         }
     }
       
-    const char * gcm_category::name() const
+    const char * gcm_category::name() const BOOST_SYSTEM_NOEXCEPT
     {
         return "gcm";
     }
     
-    std::string gcm_category::message(int ev) const
+    std::string gcm_category::message(int ev) const BOOST_SYSTEM_NOEXCEPT
     {
         switch(ev)
         {

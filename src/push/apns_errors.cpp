@@ -11,7 +11,7 @@
 namespace push {
 namespace error {
     
-    const char * apns_category::name() const
+    const char * apns_category::name() const BOOST_SYSTEM_NOEXCEPT
     {
         return "apns";
     }
