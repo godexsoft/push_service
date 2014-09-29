@@ -49,7 +49,6 @@ namespace detail {
         
         void wait_for_job();
         void handle_job_available();
-        bool verify_cert(bool accept_any, boost::asio::ssl::verify_context& ctx);
         void handle_connect(const boost::system::error_code& error);        
         void handle_handshake(const boost::system::error_code& error);
         void handle_write(const boost::system::error_code& error, size_t bytes_transferred);

@@ -210,9 +210,8 @@ namespace detail {
         
         socket_ = boost::shared_ptr<ssl_socket_t>( new ssl_socket_t(io_service_, *context) );
         
+        ssl_ctx_->set_default_verify_paths();
         socket_->set_verify_mode(boost::asio::ssl::verify_peer);
-        socket_->set_verify_callback(boost::bind(&apns_connection::verify_cert, this, _1, _2));
-        
         async_connect(socket_->lowest_layer(), iterator,
             strand_.wrap( boost::bind(&apns_connection::handle_connect, this,
                 placeholders::error) ) );
@@ -221,13 +220,6 @@ namespace detail {
     void apns_connection::restart()
     {
         start(ssl_ctx_, resolved_iterator_, callback_);
-    }
-    
-    bool apns_connection::verify_cert(bool accept_any,
-                                      boost::asio::ssl::verify_context& ctx)
-    {
-        // TODO: some real verification?
-        return accept_any;
     }
     
     void apns_connection::handle_connect(const boost::system::error_code& error)

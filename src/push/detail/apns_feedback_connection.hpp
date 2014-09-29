@@ -38,7 +38,6 @@ namespace detail {
     private:
         void stop();
         
-        bool verify_cert(bool accept_any, boost::asio::ssl::verify_context& ctx);
         void handle_connect(const boost::system::error_code& error);        
         void handle_handshake(const boost::system::error_code& error);
         void handle_read(const boost::system::error_code& err, size_t bytes_transferred);

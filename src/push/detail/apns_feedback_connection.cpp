@@ -64,23 +64,14 @@ namespace detail {
     
     void apns_feedback_connection::start(ssl::context& context,
                                          ip::tcp::resolver::iterator iterator)
-    {        
+    {
+        context.set_default_verify_paths();
         socket_ = boost::shared_ptr<ssl_socket_t>( new ssl_socket_t(io_service_, context) );
-        
         socket_->set_verify_mode(boost::asio::ssl::verify_peer);
-        socket_->set_verify_callback(
-            boost::bind(&apns_feedback_connection::verify_cert, this, _1, _2));
         
         async_connect(socket_->lowest_layer(), iterator,
             boost::bind(&apns_feedback_connection::handle_connect, this,
                 placeholders::error));
-    }
-    
-    bool apns_feedback_connection::verify_cert(bool accept_any,
-                                               boost::asio::ssl::verify_context& ctx)
-    {
-        // TODO: some real verification?
-        return accept_any;
     }
     
     void apns_feedback_connection::handle_connect(const boost::system::error_code& error)
