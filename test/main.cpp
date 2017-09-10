@@ -9,8 +9,8 @@
 #include <iostream>
 #include <boost/thread.hpp>
 
-#include <push_service.hpp>
-#include <push/detail/async_condition_variable.hpp>
+#include <push_service/push_service.hpp>
+#include <push_service/detail/async_condition_variable.hpp>
 #include <boost/thread/condition_variable.hpp>
 
 #include "util.hpp"

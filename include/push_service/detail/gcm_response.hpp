@@ -12,9 +12,9 @@
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <json_spirit/json_spirit_reader_template.h>
-
-#include <push/gcm_errors.hpp>
+#include <push_service/log.hpp>
+#include <push_service/json_spirit/json_spirit_reader_template.h>
+#include <push_service/gcm_errors.hpp>
 
 namespace push {
 namespace detail {
@@ -25,21 +25,21 @@ namespace detail {
     class gcm_response_entry
     {
     public:
-        gcm_response_entry(const push::error::gcm_entry_err_code& code = push::error::successful);
+        gcm_response_entry(const error::gcm_entry_err_code& code = error::successful);
         gcm_response_entry(const json_spirit::Object& obj);
         
-        const boost::system::error_code to_error_code() const;
+        boost::system::error_code to_error_code() const;
 
-        const push::error::gcm_entry_err_code get_status() const;
+        error::gcm_entry_err_code get_status() const;
         
         // properties
         std::string message_id;
         std::string registration_id;
         
     private:
-        const push::error::gcm_entry_err_code status_from_error(const std::string& err) const;
+        error::gcm_entry_err_code status_from_error(const std::string& err) const;
         
-        push::error::gcm_entry_err_code  status_;        
+        error::gcm_entry_err_code  status_;
     };
     
     /**
@@ -49,12 +49,12 @@ namespace detail {
     {
     public:
         friend class gcm_connection;
-        explicit gcm_response(const push::error::gcm_err_code& code = push::error::no_gcm_error);
-        explicit gcm_response(const std::string& json);
+        explicit gcm_response(const error::gcm_err_code& code = error::no_gcm_error);
+        explicit gcm_response(const std::string& json, const log_callback_type& log_callback);
         
-        const boost::system::error_code to_error_code() const;
+        boost::system::error_code to_error_code() const;
         
-        const push::error::gcm_err_code get_status() const;
+        error::gcm_err_code get_status() const;
         
         // properties
         int64_t multicast_id;
@@ -65,7 +65,9 @@ namespace detail {
         std::vector<gcm_response_entry> results;
         
     private:
-        push::error::gcm_err_code  status_;
+        error::gcm_err_code  status_;
+        log_callback_type log_callback_;
+
     };
 
 } // namespace detail

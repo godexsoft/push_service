@@ -10,9 +10,10 @@
 #define _PUSH_PROVIDER_HPP_
 
 #include <string>
+#include <push_service/log.hpp>
 
 namespace push {
-    
+
     struct push_message
     {
         virtual std::string to_json() const = 0;
@@ -30,10 +31,13 @@ namespace push {
     class provider
     {
     public:
-        provider(push_service& ps, const std::string& provider_key);
+        provider(push_service& ps, const std::string& provider_key, const log_callback_type& log_callback);
         ~provider();
         
         virtual bool validate_device(const device& dev) const = 0;
+
+    protected:
+        log_callback_type log_callback_;
 
     private:
         push_service& push_service_;

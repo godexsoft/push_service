@@ -9,7 +9,7 @@
 #ifndef _APNS_EXCEPTION_HPP_
 #define _APNS_EXCEPTION_HPP_
 
-#include <push/exception/push_exception.hpp>
+#include <push_service/exception/push_exception.hpp>
 
 namespace push {
 namespace exception {

@@ -12,8 +12,8 @@
 #include <boost/asio.hpp>
 #include <map>
 
-#include <push/push_provider.hpp>
-#include <push/exception/push_exception.hpp>
+#include <push_service/push_provider.hpp>
+#include <push_service/exception/push_exception.hpp>
 
 namespace push {
 

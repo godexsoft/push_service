@@ -20,7 +20,7 @@
 #include <openssl/x509.h>
 #include <openssl/evp.h>
 
-#include <push/exception/push_exception.hpp>
+#include <push_service/exception/push_exception.hpp>
 
 namespace push {
 namespace detail {
@@ -57,7 +57,7 @@ namespace p12 {
         {
             throw exception::push_exception(std::string(ERR_reason_error_string(ERR_get_error())));
         }
-        
+
         PKCS12_free(p12);
         sk_X509_free(ca);
         

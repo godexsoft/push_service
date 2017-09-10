@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include <push/push_service.hpp>
+#include <push_service/detail/push_service.hpp>
 
 namespace push {
     

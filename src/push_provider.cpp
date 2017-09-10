@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include <push/push_provider.hpp>
-#include <push/push_service.hpp>
+#include <push_service/push_provider.hpp>
+#include <push_service/detail/push_service.hpp>
 
 namespace push {
     device::device(const std::string& pc, const std::string& t)
@@ -16,9 +16,10 @@ namespace push {
     {
     }
     
-    provider::provider(push_service& ps, const std::string& k)
+    provider::provider(push_service& ps, const std::string& k, const log_callback_type& log_callback)
     : push_service_(ps)
     , provider_key_(k)
+    , log_callback_(log_callback)
     {
         // register with the push_service
         push_service_.add_provider(this, provider_key_);

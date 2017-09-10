@@ -15,9 +15,11 @@
 #include <boost/function.hpp>
 #include <deque>
 
-#include <push/detail/apns_request.hpp>
-#include <push/detail/apns_response.hpp>
-#include <push/detail/async_condition_variable.hpp>
+#include <push_service/log.hpp>
+#include <push_service/detail/apns_request.hpp>
+#include <push_service/detail/apns_response.hpp>
+#include <push_service/detail/async_condition_variable.hpp>
+#include <push_service/detail/connection_pool.hpp>
 
 namespace push {
 namespace detail {
@@ -36,11 +38,13 @@ namespace detail {
         friend class connection_pool<apns_connection, apns_request>;
         typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket_t;
         
-        apns_connection(pool_type& pool);
+        apns_connection(pool_type& pool, boost::posix_time::time_duration confirmation_delay, const log_callback_type& log_callback);
+        ~apns_connection() { close_socket(); }
 
         void start(boost::asio::ssl::context* const context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
-                   const callback_type& cb);
+                   const callback_type& cb,
+                   const std::string& ca_certificate_path);
         void restart();
         
     private:
@@ -48,16 +52,19 @@ namespace detail {
         void sort_cache_on_shutdown(const push::detail::apns_response& resp);
         void reset_cache_checker();
         void on_check_cache(const boost::system::error_code& err);
-        
+
+        void close_socket();
         boost::asio::io_service& get_io_service();
-        void stop();    
-        
+        void stop();
+
         void wait_for_job();
         void handle_job_available();
         void handle_connect(const boost::system::error_code& error);        
         void handle_handshake(const boost::system::error_code& error);
-        void handle_write(const boost::system::error_code& error, size_t bytes_transferred);
+        void handle_write(const boost::system::error_code& error, size_t bytes_transferred, boost::shared_ptr<ssl_socket_t> socket);
         void handle_read_err(const boost::system::error_code& err);        
+
+        const boost::posix_time::time_duration confirmation_delay_;
         
         boost::asio::io_service         io_service_;
         boost::asio::io_service::work   work_;
@@ -72,13 +79,15 @@ namespace detail {
         // We just must be sure that the ssl context is never destroyed before this instance.
         boost::asio::ssl::context* ssl_ctx_;
         boost::asio::ip::tcp::resolver::iterator resolved_iterator_;
-        
+        std::string ca_certificate_path_;
+
         apns_request current_req_;
         boost::asio::streambuf response_;
         std::deque<apns_request> cache_;
-        
-        callback_type callback_;        
+
+        callback_type callback_;
         async_condition_variable::handle_type wait_handle_;
+        log_callback_type log_callback_;
     };
 
 } // namespace detail

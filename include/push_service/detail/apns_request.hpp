@@ -19,7 +19,7 @@ namespace push {
     class device;
     
 namespace detail {
-    
+
     class apns_request
     {
     public:
@@ -32,16 +32,17 @@ namespace detail {
         apns_request(const device& dev, const std::string& payload,
                      const uint32_t expiry, const uint32_t ident);
         
-        const uint32_t get_identity() const;
+        uint32_t get_identity() const;
         
-        const boost::posix_time::ptime get_time() const;
-        
+        boost::posix_time::ptime get_time() const;
+
+        static const uint32_t invalid_ident = 0;
+
     private:
         uint32_t ident_;
         boost::posix_time::ptime time_;
-        
-        boost::array<char, 1024> body_;
-        long len_;
+        typedef std::vector<char> request_buffer;
+        boost::shared_ptr<request_buffer> body_;
     };
 
 } // namespace detail

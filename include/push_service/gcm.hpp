@@ -9,9 +9,9 @@
 #ifndef _GCM_PROVIDER_HPP_
 #define _GCM_PROVIDER_HPP_
 
-#include <push/push_provider.hpp>
-#include <push/detail/gcm_connection.hpp>
-#include <push/detail/connection_pool.hpp>
+#include <push_service/push_provider.hpp>
+#include <push_service/detail/gcm_connection.hpp>
+#include <push_service/detail/connection_pool.hpp>
 
 #include <boost/function.hpp>
 #include <string>
@@ -70,7 +70,10 @@ namespace push {
         gcm(push_service& ps,
             const std::string& project_id,
             const std::string& api_key,
+            const log_callback_type& log_callback_ = log_callback_type(),
             const uint32_t& poolsize = 1,
+            const boost::posix_time::time_duration restart_delay = boost::posix_time::seconds(1),
+            const boost::posix_time::time_duration confirmation_delay = boost::posix_time::seconds(1),
             const callback_type& cb = callback_type());
         
         bool validate_device(const device& dev) const;

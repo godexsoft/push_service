@@ -22,8 +22,9 @@
 #include <boost/thread/condition_variable.hpp>
 #include <boost/optional.hpp>
 
-#include <push/exception/push_exception.hpp>
-#include <push/detail/async_condition_variable.hpp>
+#include <push_service/log.hpp>
+#include <push_service/exception/push_exception.hpp>
+#include <push_service/detail/async_condition_variable.hpp>
 
 namespace push {
 namespace detail {
@@ -35,9 +36,13 @@ namespace detail {
         typedef typename T::callback_type
             callback_type;
         
-        connection_pool(boost::asio::io_service& io, const uint32_t cnt)
+        connection_pool(boost::asio::io_service& io, const uint32_t cnt, boost::posix_time::time_duration restart_delay,
+                        boost::posix_time::time_duration confirmation_delay, const log_callback_type& log_callback)
         : callback_io_(io)
         , condition_(io)
+        , restart_delay_(restart_delay)
+        , confirmation_delay_(confirmation_delay)
+        , log_callback_(log_callback)
         {
             if(cnt < 1)
             {
@@ -49,25 +54,30 @@ namespace detail {
                 spawn_connection();
             }
         }
-        
+
         ~connection_pool()
         {
-            // stop all connections
-            std::for_each(connections_.begin(), connections_.end(),
-                boost::bind(&T::stop, _1) );
-
+            stop();
             threads_.join_all();
         }
 
         void start(boost::asio::ssl::context& context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
-                   const callback_type& cb)
+                   const callback_type& cb,
+                   const std::string& ca_certificate_path)
         {
             std::for_each(connections_.begin(), connections_.end(),
                 callback_io_.wrap(
-                    boost::bind(&T::start, _1, &context, iterator, callback_io_.wrap(cb) ) ) );
+                    boost::bind(&T::start, _1, &context, iterator, callback_io_.wrap(cb), ca_certificate_path) ) );
         }
-        
+
+        void stop()
+        {
+            // stop all connections
+            std::for_each(connections_.begin(), connections_.end(),
+                boost::bind(&T::stop, _1) );
+        }
+
         void post(const J& job)
         {
             {
@@ -115,42 +125,61 @@ namespace detail {
         
         void run_one(boost::shared_ptr<T>& con)
         {
-            try
+            boost::asio::deadline_timer restart_timer(con->get_io_service());
+            for (;;)
             {
-                con->get_io_service().run();
-            }
-            catch(std::exception& e)
-            {
-                // just restart the connection
-                // con->restart();
-                // TODO: figure out how to restart the connection properly
-                throw;
+               try
+               {
+                   con->get_io_service().run();
+                   break;
+               }
+               catch (const std::exception& ex)
+               {
+                   PUSH_LOG(ex.what(), LogLevel::ERROR);
+                   // restart the connection after delay
+                   restart_timer.cancel();
+                   restart_timer.expires_from_now(restart_delay_);
+                   boost::weak_ptr<T> weak_con = con;
+                   restart_timer.async_wait([weak_con](boost::system::error_code) {
+                      if (auto con = weak_con.lock())
+                        con->restart();
+                   });
+                   continue;
+               }
             }
         }
         
         void spawn_connection()
         {
-            boost::shared_ptr<T> con = boost::shared_ptr<T> ( new T(*this) );
+            boost::shared_ptr<T> con = boost::shared_ptr<T> ( new T(*this, confirmation_delay_, log_callback_) );
             connections_.push_back(con);
             
             threads_.create_thread(
                 boost::bind(&connection_pool::run_one, this, con) );
         }
-        
+
         /// io_service which we will use for the callbacks
         boost::asio::io_service&    callback_io_;
+
+        /// delay for restart after error
+        const boost::posix_time::time_duration restart_delay_;
+
+        /// period of checking requests
+        const boost::posix_time::time_duration confirmation_delay_;
 
         /// Connection pool's own threads
         boost::thread_group         threads_;
 
-        /// All available connections
-        std::vector<boost::shared_ptr<T> > connections_;
-
         boost::mutex                       mutex_;
         detail::async_condition_variable   condition_;
         
+        /// All available connections
+        std::vector<boost::shared_ptr<T> > connections_;
+
         /// Requests to process
         std::queue<J> jobs_;
+
+        log_callback_type log_callback_;
     };
 
 } // namespace detail

@@ -36,7 +36,7 @@ namespace detail {
                     const std::string& payload,
                     const uint32_t& ident);
         
-        const uint32_t get_identity() const;
+        uint32_t get_identity() const;
         
     private:
         boost::asio::streambuf request_;

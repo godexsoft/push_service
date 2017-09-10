@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include <push/detail/gcm_request.hpp>
-#include <push/push_provider.hpp>
+#include <push_service/detail/gcm_request.hpp>
+#include <push_service/push_provider.hpp>
 
 #include <algorithm>
 #include <ostream>
@@ -43,7 +43,7 @@ namespace detail {
         return *this;
     }
     
-    gcm_request::gcm_request(const device& dev,
+    gcm_request::gcm_request(const device& /*dev*/,
                              const std::string& api_key,
                              const std::string& payload,
                              const uint32_t& ident)
@@ -62,7 +62,7 @@ namespace detail {
         request_stream << payload;
     }
     
-    const uint32_t gcm_request::get_identity() const
+    uint32_t gcm_request::get_identity() const
     {
         return ident_;
     }

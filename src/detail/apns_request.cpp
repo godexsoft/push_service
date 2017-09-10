@@ -6,16 +6,17 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include <push/detail/apns_request.hpp>
-#include <push/push_provider.hpp>
+#include <push_service/detail/apns_request.hpp>
+#include <push_service/push_provider.hpp>
 #include <algorithm>
 #include <boost/thread.hpp>
+#include <boost/make_shared.hpp>
 
 namespace push {
 namespace detail {
     
     apns_request::apns_request()
-    : len_(0)
+    : ident_(invalid_ident)
     {
     }
     
@@ -23,13 +24,13 @@ namespace detail {
     : ident_(r.ident_)
     , time_(boost::posix_time::microsec_clock::local_time()) // set to now
     , body_(r.body_)
-    , len_(r.len_)
     {
     }
     
     apns_request::apns_request(const device& dev, const std::string& payload,
                                const uint32_t expiry, const uint32_t ident)
     : ident_(ident)
+    , body_( boost::make_shared<request_buffer>( payload.size() + 32 + 2*sizeof(int32_t) + 2*sizeof(int16_t) + sizeof(char) ) )
     {
         char cmd = 1;
         int16_t token_len = htons(32);
@@ -37,8 +38,7 @@ namespace detail {
         int32_t expiration = htonl(expiry);
         int16_t payload_len = htons( payload.size() );
                 
-        char buf[1024] = {0,};
-        char *p = buf;
+        char *p = body_->data();
         
         memcpy(p, &cmd, sizeof(char));
         ++p;
@@ -60,17 +60,16 @@ namespace detail {
         
         memcpy(p, payload.data(), payload.size());
         p += payload.size();
-        
-        len_ = p - buf;
-        memcpy(body_.elems, buf, len_);
+
+        assert( p <= body_->data() + body_->size() );
     }
 
-    const uint32_t apns_request::get_identity() const
+    uint32_t apns_request::get_identity() const
     {
         return ident_;
     }
 
-    const boost::posix_time::ptime apns_request::get_time() const
+    boost::posix_time::ptime apns_request::get_time() const
     {
         return time_;
     }

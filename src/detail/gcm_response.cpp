@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include <push/detail/gcm_response.hpp>
-#include <push/gcm_errors.hpp>
+#include <push_service/detail/gcm_response.hpp>
+#include <push_service/gcm_errors.hpp>
 
 #include <sstream>
 
@@ -45,7 +45,7 @@ namespace detail {
         }
     }
     
-    const push::error::gcm_entry_err_code gcm_response_entry::status_from_error(const std::string& err) const
+    push::error::gcm_entry_err_code gcm_response_entry::status_from_error(const std::string& err) const
     {
         if(err == "MissingRegistration")
         {
@@ -91,12 +91,12 @@ namespace detail {
         return push::error::unknown_entry_error;
     }
     
-    const boost::system::error_code gcm_response_entry::to_error_code() const
+    boost::system::error_code gcm_response_entry::to_error_code() const
     {
         return boost::system::error_code(status_, push::error::gcm_entry_error_category);
     }
     
-    const push::error::gcm_entry_err_code gcm_response_entry::get_status() const
+    push::error::gcm_entry_err_code gcm_response_entry::get_status() const
     {
         return status_;
     }
@@ -110,17 +110,20 @@ namespace detail {
     {
     }
     
-    gcm_response::gcm_response(const std::string& json)
+    gcm_response::gcm_response(const std::string& json, const log_callback_type& log_callback)
     : multicast_id(-1)
     , success(0)
     , failure(0)
     , canonical_ids(0)
     , status_(push::error::no_gcm_error)
+    , log_callback_(log_callback)
     {   
         Value val;
         if(!read_string(json, val))
         {
-            std::cout << "FAILED ON JSON: " << json << "\n";
+            std::stringstream fail_message;
+            fail_message << "failed on JSON: " << json;
+            PUSH_LOG(fail_message.str(), LogLevel::ERROR);
             status_ = push::error::json_parsing_error;
             return;
         }
@@ -160,12 +163,12 @@ namespace detail {
         }
     }
     
-    const boost::system::error_code gcm_response::to_error_code() const
+    boost::system::error_code gcm_response::to_error_code() const
     {
         return boost::system::error_code(status_, push::error::gcm_error_category);
     }
     
-    const push::error::gcm_err_code gcm_response::get_status() const
+    push::error::gcm_err_code gcm_response::get_status() const
     {
         return status_;
     }

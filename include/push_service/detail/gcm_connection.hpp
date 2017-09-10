@@ -15,9 +15,10 @@
 #include <boost/function.hpp>
 #include <deque>
 
-#include <push/detail/gcm_request.hpp>
-#include <push/detail/gcm_response.hpp>
-#include <push/detail/async_condition_variable.hpp>
+#include <push_service/log.hpp>
+#include <push_service/detail/gcm_request.hpp>
+#include <push_service/detail/gcm_response.hpp>
+#include <push_service/detail/async_condition_variable.hpp>
 
 namespace push {
 namespace detail {
@@ -36,11 +37,12 @@ namespace detail {
         friend class connection_pool<gcm_connection, gcm_request>;
         typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket_t;
         
-        gcm_connection(pool_type& pool);
+        gcm_connection(pool_type& pool, const boost::posix_time::time_duration confirmation_delay, const log_callback_type& log_callback);
 
         void start(boost::asio::ssl::context* const context,
                    boost::asio::ip::tcp::resolver::iterator iterator,
-                   const callback_type& cb);
+                   const callback_type& cb,
+                   const std::string& ca_certificate_path);
         void restart();
         
     private:
@@ -70,6 +72,7 @@ namespace detail {
         // We just must be sure that the ssl context is never destroyed before this instance.
         boost::asio::ssl::context* ssl_ctx_;
         boost::asio::ip::tcp::resolver::iterator resolved_iterator_;
+        std::string ca_certificate_path_;
         
         gcm_request current_req_;
         boost::asio::streambuf response_;
@@ -81,6 +84,7 @@ namespace detail {
         async_condition_variable::handle_type wait_handle_;
         
         bool new_request_;
+        log_callback_type log_callback_;
     };
 
 } // namespace detail

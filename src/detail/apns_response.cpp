@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 godexsoft. All rights reserved.
 //
 
-#include <push/detail/apns_response.hpp>
-#include <push/apns_errors.hpp>
+#include <push_service/detail/apns_response.hpp>
+#include <push_service/apns_errors.hpp>
 #include <boost/asio/streambuf.hpp>
 
 namespace push {
@@ -39,7 +39,8 @@ namespace detail {
         identity_ = ntohl(ident);
     }
     
-    apns_feedback_response::apns_feedback_response(std::string& data)
+    apns_feedback_response::apns_feedback_response(std::string& data, const log_callback_type& log_callback)
+       : log_callback_(log_callback)
     {
         char* p = &data.at(0);
         
@@ -54,37 +55,40 @@ namespace detail {
         p += sizeof(uint16_t);
 
         token_len = ntohs(token_len);
-        
-        std::cout << "token len is " << token_len << std::endl;
-        std::vector<char> token_bytes(token_len, 0);
+        std::stringstream token_len_message;
+        token_len_message << "token len is " << token_len;
+        PUSH_LOG(token_len_message.str(), LogLevel::DEBUG);
 
+        std::vector<char> token_bytes(token_len, 0);
         memcpy(&token_bytes.at(0), p, token_len);
         token_ = std::string(token_bytes.begin(), token_bytes.end());
         
-        std::cout << "token: " << token_ << std::endl;
+        std::stringstream token_message;
+        token_message << "feedback token: " << token_;
+        PUSH_LOG(token_message.str(), LogLevel::INFO);
     }
     
-    const boost::system::error_code apns_response::to_error_code() const
+    boost::system::error_code apns_response::to_error_code() const
     {
         return boost::system::error_code(status_, push::error::apns_error_category);
     }
     
-    const push::error::apns_err_code apns_response::get_status() const
+    push::error::apns_err_code apns_response::get_status() const
     {
         return status_;
     }
     
-    const uint32_t apns_response::get_identity() const
+    uint32_t apns_response::get_identity() const
     {
         return identity_;
     }
 
-    const boost::posix_time::ptime apns_feedback_response::get_time() const
+    boost::posix_time::ptime apns_feedback_response::get_time() const
     {
         return time_;
     }
     
-    const std::string apns_feedback_response::get_token() const
+    std::string apns_feedback_response::get_token() const
     {
         return token_;
     }
