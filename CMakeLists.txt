@@ -36,8 +36,7 @@ file(GLOB_RECURSE ALL_SRC src/*.cpp)
 
 # set includes
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories("src")
-include_directories("ext")
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive" )
 

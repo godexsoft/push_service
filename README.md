@@ -8,7 +8,6 @@ Require
 - Boost.Thread
 - Boost.Bind and Boost.Function
 - Boost.Foreach
-- JSON spirit (header-only, included)
 
 License
 

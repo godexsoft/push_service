@@ -1,0 +1,96 @@
+//
+//  apns_connection.hpp
+//  push_service
+//
+//  Created by Alexander Kremer on 08/07/2013.
+//  Copyright (c) 2013 godexsoft. All rights reserved.
+//
+
+#ifndef _PUSH_SERVICE_APNS_CONNECTION_HPP_
+#define _PUSH_SERVICE_APNS_CONNECTION_HPP_
+
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <deque>
+
+#include <push_service/log.hpp>
+#include <push_service/detail/apns_request.hpp>
+#include <push_service/detail/apns_response.hpp>
+#include <push_service/detail/async_condition_variable.hpp>
+#include <push_service/detail/connection_pool.hpp>
+
+namespace push {
+namespace detail {
+
+    template <typename T, typename J> class connection_pool;
+    
+    class apns_connection
+    {
+    public:
+        typedef boost::function<void(const boost::system::error_code&,
+            const uint32_t&)> callback_type;
+        
+        typedef connection_pool<apns_connection, apns_request>
+            pool_type;
+        
+        friend class connection_pool<apns_connection, apns_request>;
+        typedef boost::asio::ssl::stream<boost::asio::ip::tcp::socket> ssl_socket_t;
+        
+        apns_connection(pool_type& pool, boost::posix_time::time_duration confirmation_delay, const log_callback_type& log_callback);
+        ~apns_connection() { close_socket(); }
+
+        void start(boost::asio::ssl::context* const context,
+                   boost::asio::ip::tcp::resolver::iterator iterator,
+                   const callback_type& cb,
+                   const std::string& ca_certificate_path);
+        void restart();
+        
+    private:
+        void sort_cache_on_error(const push::detail::apns_response& resp);
+        void sort_cache_on_shutdown(const push::detail::apns_response& resp);
+        void reset_cache_checker();
+        void on_check_cache(const boost::system::error_code& err);
+
+        void close_socket();
+        boost::asio::io_service& get_io_service();
+        void stop();
+
+        void wait_for_job();
+        void handle_job_available();
+        void handle_connect(const boost::system::error_code& error);        
+        void handle_handshake(const boost::system::error_code& error);
+        void handle_write(const boost::system::error_code& error, size_t bytes_transferred, boost::shared_ptr<ssl_socket_t> socket);
+        void handle_read_err(const boost::system::error_code& err);        
+
+        const boost::posix_time::time_duration confirmation_delay_;
+        
+        boost::asio::io_service         io_service_;
+        boost::asio::io_service::work   work_;
+        boost::asio::strand             strand_;
+        boost::asio::deadline_timer     cache_check_timer_;
+
+        boost::shared_ptr<ssl_socket_t> socket_;
+        pool_type& pool_;
+        
+        // FIXME: pointers are not very nice. however, the connection object MUST
+        // outlive the connection_pool and the holder of connection pool by design.
+        // We just must be sure that the ssl context is never destroyed before this instance.
+        boost::asio::ssl::context* ssl_ctx_;
+        boost::asio::ip::tcp::resolver::iterator resolved_iterator_;
+        std::string ca_certificate_path_;
+
+        apns_request current_req_;
+        boost::asio::streambuf response_;
+        std::deque<apns_request> cache_;
+
+        callback_type callback_;
+        async_condition_variable::handle_type wait_handle_;
+        log_callback_type log_callback_;
+    };
+
+} // namespace detail
+} // namespace push
+
+#endif // _PUSH_SERVICE_APNS_CONNECTION_HPP_
